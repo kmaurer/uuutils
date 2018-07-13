@@ -10,28 +10,28 @@ make_sim_mat <- function(D_test, sigma=.1, scale=TRUE){
 # dist_test is nXn distance matrix for numeric features of test data
 # Q_idx index of oracle queried test observations from D_test
 # ...
-# P_explainx_Q <- function(sim_mat, Q_idx, true_misclass, c_MX, tau, sigma=.1){
+# P_explainx_Q <- function(sim_mat, Q_idx, true_misclass, c_MX, tau, sigma=.1, add_cost=FALSE, cost_power=1){
 #   D_test_idx <- 1:nrow(sim_mat)
 #   # pick out indeces for identified UUs
 #   Q_ind_uu <- Q_idx[which(true_misclass[Q_idx]==1 & c_MX[Q_idx]>tau)]
+#   cost <- 1
+#   if(add_cost) cost <- c_MX[Q_ind_uu]^cost_power
 #   if(length(Q_ind_uu)==0){
 #     tmp <- rep(0,nrow(sim_mat))
 #   } else {
-#     tmp <- sapply( D_test_idx, function(x_idx) max(sim_mat[x_idx , Q_ind_uu]) )
+#     tmp <- sapply( D_test_idx, function(x_idx) max(sim_mat[x_idx , Q_ind_uu]*cost) )
 #   }
 #   return(tmp)
 # }
 
-P_explainx_Q <- function(sim_mat, Q_idx, true_misclass, c_MX, tau, sigma=.1, add_cost=FALSE, cost_power=1){
+P_explainx_Q <- function(sim_mat, Q_idx, true_misclass, c_MX, tau, sigma=.1,...){
   D_test_idx <- 1:nrow(sim_mat)
   # pick out indeces for identified UUs
   Q_ind_uu <- Q_idx[which(true_misclass[Q_idx]==1 & c_MX[Q_idx]>tau)]
-  cost <- 1
-  if(add_cost) cost <- c_MX[Q_ind_uu]^cost_power
   if(length(Q_ind_uu)==0){
     tmp <- rep(0,nrow(sim_mat))
   } else {
-    tmp <- sapply( D_test_idx, function(x_idx) max(sim_mat[x_idx , Q_ind_uu]*cost) )
+    tmp <- sapply( D_test_idx, function(x_idx) max(sim_mat[x_idx , Q_ind_uu]) )
   }
   return(tmp)
 }
@@ -45,14 +45,26 @@ make_Qc_index <- function(D_test_idx, Q_idx){
 
 #---------------------------------------
 # Expected changes in utility function for adding observations in set of possible UUs (S)
-exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, 
-                                 add_cost=FALSE,cost_power=1,cost_diff=FALSE){
-  if(add_cost) sims_Dtest_Sc <- t(t(sim_mat[,Sc_idx])*c_MX[Sc_idx]^cost_power)
-  if(!add_cost) sims_Dtest_Sc <- sim_mat[,Sc_idx]
+# exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, 
+#                                  add_cost=FALSE,cost_power=1,cost_diff=FALSE){
+#   if(add_cost) sims_Dtest_Sc <- t(t(sim_mat[,Sc_idx])*c_MX[Sc_idx]^cost_power)
+#   if(!add_cost) sims_Dtest_Sc <- sim_mat[,Sc_idx]
+#   # for each candidate evaluate change in utility assuming it is UU, then multiply by phi(x)
+#   util_s <- sapply(1:length(Sc_idx), function(s){
+#     P_expx_Qands <- ifelse(sims_Dtest_Sc[,s] > P_expx_Q , sims_Dtest_Sc[,s], P_expx_Q)
+#     ifelse(cost_diff, t(c_MX^cost_power-phi_D_test^cost_power) %*% P_expx_Qands, t(c_MX^cost_power) %*% P_expx_Qands)
+#   })
+#   as.vector(phi_D_test[Sc_idx] * util_s)
+# }
+
+conf_cost <- function(c_MX,...) I(c_MX)
+
+exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn=conf_cost, ...){
+  sims_Dtest_Sc <- sim_mat[,Sc_idx]
   # for each candidate evaluate change in utility assuming it is UU, then multiply by phi(x)
   util_s <- sapply(1:length(Sc_idx), function(s){
     P_expx_Qands <- ifelse(sims_Dtest_Sc[,s] > P_expx_Q , sims_Dtest_Sc[,s], P_expx_Q)
-    ifelse(cost_diff, t(c_MX^cost_power-phi_D_test^cost_power) %*% P_expx_Qands, t(c_MX^cost_power) %*% P_expx_Qands)
+    t(cost_fctn(c_MX,phi_D_test,...)) %*% P_expx_Qands
   })
   as.vector(phi_D_test[Sc_idx] * util_s)
 }
@@ -198,7 +210,8 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
 adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
                         phi_mod_type="rf",clust_max=5,clust_set=NULL, prior=rep(.5,nrow(D_test)),
                         sigma=.001, scale=TRUE, updateprior=FALSE, lambda=2,
-                        add_cost=FALSE,cost_power=1,cost_diff=FALSE){ 
+                        # add_cost=FALSE,cost_power=1,cost_diff=FALSE, 
+                        cost_fctn=conf_cost, ...){ 
   # Set up index partion of observations that are in/out of oracle query set
   D_test_idx <- 1:nrow(D_test)
   Q_idx <- Q_prime_idx
@@ -215,34 +228,38 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
   # calculate and store utility gain in query priming set
   if(length(Q_prime_idx) > 0){
     for (b in 1:length(Q_prime_idx)){
-      if(cost_diff){
-        utility[b] <- t(c_MX^cost_power-phi_D_test^cost_power) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau, add_cost=add_cost,cost_power=cost_power)
-      }else{
-        utility[b] <- t(c_MX^cost_power) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau, add_cost=add_cost,cost_power=cost_power)
-      }
+      # if(cost_diff){
+      #   utility[b] <- t(c_MX^cost_power-phi_D_test^cost_power) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau, add_cost=add_cost,cost_power=cost_power)
+      # }else{
+      #   utility[b] <- t(c_MX^cost_power) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau, add_cost=add_cost,cost_power=cost_power)
+      # }
+      utility[b] <- t(cost_fctn(c_MX,phi_D_test)) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau)
     }
   }
   # For each step until we reach budget B:
-  P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau, add_cost=add_cost,cost_power=cost_power)
+  # P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau, add_cost,cost_power)
+  P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
   for (b in (length(Q_prime_idx)+1):B){
     # find optimal new q observations
     Sc_idx <- Qc_idx[c_MX[Qc_idx]>tau] #candidates must be of high enough confidence to possibly be UU
-    q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, add_cost,cost_power,cost_diff))]
+    q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn, ...))]
     # updated query set
     Q_idx <- c(Q_idx,q_new_idx)
     Qc_idx <- make_Qc_index(D_test_idx,Q_idx)
     # update utility
-    P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau, add_cost,cost_power)
+    # P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau, add_cost,cost_power)
+    P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
     
-    if(cost_diff){
-      utility[b] <- t(c_MX^cost_power-phi_D_test^cost_power) %*% P_expx_Q
-    }else{
-      utility[b] <- t(c_MX^cost_power) %*% P_expx_Q
-    }
+    # if(cost_diff){
+    #   utility[b] <- t(c_MX^cost_power-phi_D_test^cost_power) %*% P_expx_Q
+    # }else{
+    #   utility[b] <- t(c_MX^cost_power) %*% P_expx_Q
+    # }
+    utility[b] <- t(cost_fctn(c_MX, phi_D_test)) %*% P_expx_Q
     # update phi 
     phi_D_test <- phi_all(D_test, c_MX, true_misclass, Q_idx, tau, prior, phi_mod_type,
                           clust_out,updateprior, lambda)
-    if(b%%5==0) print(paste("Query",b,"of",B,"Complete"))
+    if(b%%10==0) print(paste("Query",b,"of",B,"Complete"))
   }
   return(list(Q_idx=Q_idx,utility=utility))
 }
@@ -252,14 +269,16 @@ adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx =
                                       phi_mod_types = c("most_uncertain","omniscient"),
                                       prior=1-c_MX, B=20, tau = .65, sigma=.001,
                                       clust_max=5,scale=TRUE, 
-                                      add_cost=FALSE,cost_power=1, cost_diff=FALSE){
+                                      # add_cost=FALSE,cost_power=1, cost_diff=FALSE,
+                                      cost_fctn=conf_cost, ...){
   all_results <- NULL
   if("rf" %in% phi_mod_types){
     ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                       Q_prime_idx=Q_prime_idx, B=B, tau=tau,
                       phi_mod_type="rf",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, 
-                      lambda=2, add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff)
+                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
+                      # add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff,
+                      cost_fctn=cost_fctn)
     all_results <- rbind(all_results,
                          data.frame(method="rf", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
     print("Done with random forest queries")
@@ -268,8 +287,9 @@ adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx =
     ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                       Q_prime_idx=Q_prime_idx, B=B, tau=tau,
                       phi_mod_type="logistic",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, 
-                      lambda=2, add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff)
+                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
+                      # add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff,
+                      cost_fctn=cost_fctn)
     all_results <- rbind(all_results,
                          data.frame(method="logistic", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
     print("Done with logistic queries")
@@ -278,8 +298,9 @@ adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx =
     ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                       Q_prime_idx=Q_prime_idx, B=B, tau=tau,
                       phi_mod_type="cluster_prior",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, 
-                      lambda=2, add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff)
+                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
+                      # add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff,
+                      cost_fctn=cost_fctn)
     all_results <- rbind(all_results,
                          data.frame(method="cluster_prior", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
     print("Done with cluster prior queries")
@@ -288,8 +309,9 @@ adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx =
     ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                       Q_prime_idx=Q_prime_idx, B=B, tau=tau,
                       phi_mod_type="omniscient",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, 
-                      lambda=2, add_cost=add_cost, cost_diff=cost_diff)
+                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
+                      # add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff,
+                      cost_fctn=cost_fctn, ... )
     all_results <- rbind(all_results,
                          data.frame(method="omniscient", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
     print("Done with omniscient upper bound queries")
@@ -298,8 +320,9 @@ adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx =
     ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                       Q_prime_idx=order(c_MX)[1:B], B=B+1, tau=tau,
                       phi_mod_type="most_uncertain",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, 
-                      lambda=2, add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff)
+                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
+                      # add_cost=add_cost,cost_power=cost_power, cost_diff=cost_diff,
+                      cost_fctn=cost_fctn)
     all_results <- rbind(all_results,
                          data.frame(method="most_uncertain", utility=ag$utility[1:B], Q_idx=ag$Q_idx[1:B], b=1:B))
     print("Done with most_uncertain upper bound queries")
