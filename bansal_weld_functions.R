@@ -224,67 +224,25 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
                           clust_out,updateprior, lambda)
     if(b%%10==0) print(paste("Query",b,"of",B,"Complete"))
   }
-  return(list(Q_idx=Q_idx,utility=utility))
+  # return(list(Q_idx=Q_idx,utility=utility))
+  return(data.frame(cost=as.character(body(cost_fctn))[2],
+                    phi=phi_mod_type, utility=utility, Q_idx=Q_idx, b=1:B))
 }
 
 ### bundle into function to produce all result sets of interest
 adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                       phi_mod_types = c("most_uncertain","omniscient"),
                                       prior=1-c_MX, B=20, tau = .65, sigma=.001,
-                                      clust_max=5,scale=TRUE, 
-                                      cost_fctn=conf_cost, ...){
-  all_results <- NULL
-  if("rf" %in% phi_mod_types){
-    ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                      Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                      phi_mod_type="rf",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
-                      cost_fctn=cost_fctn)
-    all_results <- rbind(all_results,
-                         data.frame(method="rf", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
-    print("Done with random forest queries")
-  } 
-  if("logistic" %in% phi_mod_types){
-    ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                      Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                      phi_mod_type="logistic",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
-                      cost_fctn=cost_fctn)
-    all_results <- rbind(all_results,
-                         data.frame(method="logistic", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
-    print("Done with logistic queries")
-  } 
-  if("cluster_prior" %in% phi_mod_types){
-    ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                      Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                      phi_mod_type="cluster_prior",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
-                      cost_fctn=cost_fctn)
-    all_results <- rbind(all_results,
-                         data.frame(method="cluster_prior", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
-    print("Done with cluster prior queries")
-  } 
-  if("omniscient" %in% phi_mod_types){
-    ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                      Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                      phi_mod_type="omniscient",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
-                      cost_fctn=cost_fctn, ... )
-    all_results <- rbind(all_results,
-                         data.frame(method="omniscient", utility=ag$utility, Q_idx=ag$Q_idx, b=1:B))
-    print("Done with omniscient upper bound queries")
-  } 
-  if("most_uncertain" %in% phi_mod_types){
-    ag <- adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                      Q_prime_idx=order(c_MX)[1:B], B=B+1, tau=tau,
-                      phi_mod_type="most_uncertain",clust_max=clust_max,clust_set=NULL, 
-                      prior=prior,sigma=sigma, scale=scale, updateprior=FALSE, lambda=2,
-                      cost_fctn=cost_fctn)
-    all_results <- rbind(all_results,
-                         data.frame(method="most_uncertain", utility=ag$utility[1:B], Q_idx=ag$Q_idx[1:B], b=1:B))
-    print("Done with most_uncertain upper bound queries")
-  } 
-  return(all_results)
+                                      clust_max=5,scale=TRUE, cost_fctn=conf_cost, ...){
+  # apply greedy to all in list
+  results_list <-lapply(phi_mod_types, function(phi_mod_type){
+    adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
+                Q_prime_idx=Q_prime_idx, B=B, tau=tau,
+                phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
+                prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
+                cost_fctn=cost_fctn)
+  })
+  do.call(rbind, results_list)
 } 
 
 
