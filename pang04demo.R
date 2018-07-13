@@ -22,7 +22,7 @@ scale=TRUE
 add_cost=TRUE
 
 conf_cost <- function(c_MX,...)  c_MX 
-power_cost <- function(c_MX, power=2) c_MX^power
+power_cost <- function(c_MX,phi_D_test, power=2) c_MX^power
 power_cost_diff <- function(c_MX, phi_D_test, power=2)  c_MX^power - phi_D_test^power
 
 all_results <- adaptive_query_comparison(phi_mod_types = c("rf","cluster_prior"),
