@@ -225,24 +225,28 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
     if(b%%10==0) print(paste("Query",b,"of",B,"Complete"))
   }
   # return(list(Q_idx=Q_idx,utility=utility))
-  return(data.frame(cost=as.character(body(cost_fctn))[2],
+  return(data.frame(cost=as.character(body(cost_fctn))[length(as.character(body(cost_fctn)))],
                     phi=phi_mod_type, utility=utility, Q_idx=Q_idx, b=1:B))
 }
 
 ### bundle into function to produce all result sets of interest
-adaptive_query_comparison <- function(D_test, c_MX, true_misclass, Q_prime_idx = NULL,
-                                      phi_mod_types = c("most_uncertain","omniscient"),
+adaptive_query_comparison <- function(phi_mod_types = c("most_uncertain","omniscient"),
+                                      cost_fctn_list=list(conf_cost),
+                                      D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                       prior=1-c_MX, B=20, tau = .65, sigma=.001,
                                       clust_max=5,scale=TRUE, cost_fctn=conf_cost, ...){
   # apply greedy to all in list
-  results_list <-lapply(phi_mod_types, function(phi_mod_type){
-    adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
-                prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
-                cost_fctn=cost_fctn)
+  cost_results_list <-lapply(1:length(cost_fctn_list), function(cost_fctn_idx){
+    phi_results <- lapply(phi_mod_types, function(phi_mod_type){
+      adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
+                  Q_prime_idx=Q_prime_idx, B=B, tau=tau,
+                  phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
+                  prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
+                  cost_fctn=cost_fctn_list[[cost_fctn_idx]])
+    })
+    do.call(rbind, phi_results)
   })
-  do.call(rbind, results_list)
+  do.call(rbind, cost_results_list)
 } 
 
 
