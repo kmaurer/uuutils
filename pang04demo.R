@@ -26,7 +26,8 @@ power_cost <- function(c_MX,phi_D_test, power=2) c_MX^power
 power_cost_diff <- function(c_MX, phi_D_test, power=2)  c_MX^power - phi_D_test^power
 
 all_results <- adaptive_query_comparison(phi_mod_types = c("rf","cluster_prior"),
-                                          cost_fctn_list=list(conf_cost,power_cost,power_cost_diff),
+                                          cost_fctn_vec=list("conf_cost","power_cost","power_cost_diff"),
                                           D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                           prior=1-c_MX, B=B, tau = .65, sigma=.001,
-                                          clust_max=5,scale=TRUE, cost_fctn=conf_cost)
+                                          clust_max=5,scale=TRUE)
+

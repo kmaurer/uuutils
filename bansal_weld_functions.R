@@ -35,12 +35,12 @@ conf_cost <- function(c_MX,...) I(c_MX)
 
 #---------------------------------------
 # Expected changes in utility function for adding observations in set of possible UUs (S)
-exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn=conf_cost, ...){
+exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn="conf_cost", ...){
   sims_Dtest_Sc <- sim_mat[,Sc_idx]
   # for each candidate evaluate change in utility assuming it is UU, then multiply by phi(x)
   util_s <- sapply(1:length(Sc_idx), function(s){
     P_expx_Qands <- ifelse(sims_Dtest_Sc[,s] > P_expx_Q , sims_Dtest_Sc[,s], P_expx_Q)
-    t(cost_fctn(c_MX,phi_D_test,...)) %*% P_expx_Qands
+    t(get(cost_fctn)(c_MX,phi_D_test)) %*% P_expx_Qands
   })
   as.vector(phi_D_test[Sc_idx] * util_s)
 }
@@ -187,7 +187,7 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
 adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
                         phi_mod_type="rf",clust_max=5,clust_set=NULL, prior=rep(.5,nrow(D_test)),
                         sigma=.001, scale=TRUE, updateprior=FALSE, lambda=2,
-                        cost_fctn=conf_cost, ...){ 
+                        cost_fctn="conf_cost", ...){ 
   # Set up index partion of observations that are in/out of oracle query set
   D_test_idx <- 1:nrow(D_test)
   Q_idx <- Q_prime_idx
@@ -204,7 +204,7 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
   # calculate and store utility gain in query priming set
   if(length(Q_prime_idx) > 0){
     for (b in 1:length(Q_prime_idx)){
-      utility[b] <- t(cost_fctn(c_MX,phi_D_test)) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau)
+      utility[b] <- t(get(cost_fctn)(c_MX,phi_D_test)) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau)
     }
   }
   # For each step until we reach budget B:
@@ -212,37 +212,37 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
   for (b in (length(Q_prime_idx)+1):B){
     # find optimal new q observations
     Sc_idx <- Qc_idx[c_MX[Qc_idx]>tau] #candidates must be of high enough confidence to possibly be UU
-    q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn, ...))]
+    q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn))]
     # updated query set
     Q_idx <- c(Q_idx,q_new_idx)
     Qc_idx <- make_Qc_index(D_test_idx,Q_idx)
     # update utility
     P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
-    utility[b] <- t(cost_fctn(c_MX, phi_D_test)) %*% P_expx_Q
+    utility[b] <- t(get(cost_fctn)(c_MX, phi_D_test)) %*% P_expx_Q
     # update phi 
     phi_D_test <- phi_all(D_test, c_MX, true_misclass, Q_idx, tau, prior, phi_mod_type,
                           clust_out,updateprior, lambda)
     if(b%%10==0) print(paste("Query",b,"of",B,"Complete"))
   }
   # return(list(Q_idx=Q_idx,utility=utility))
-  return(data.frame(cost=as.character(body(cost_fctn))[length(as.character(body(cost_fctn)))],
+  return(data.frame(cost=cost_fctn,
                     phi=phi_mod_type, utility=utility, Q_idx=Q_idx, b=1:B))
 }
 
 ### bundle into function to produce all result sets of interest
 adaptive_query_comparison <- function(phi_mod_types = c("most_uncertain","omniscient"),
-                                      cost_fctn_list=list(conf_cost),
+                                      cost_fctn_vec=c("conf_cost"),
                                       D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                       prior=1-c_MX, B=20, tau = .65, sigma=.001,
-                                      clust_max=5,scale=TRUE, cost_fctn=conf_cost, ...){
+                                      clust_max=5,scale=TRUE,  ...){
   # apply greedy to all in list
-  cost_results_list <-lapply(1:length(cost_fctn_list), function(cost_fctn_idx){
+  cost_results_list <-lapply(1:length(cost_fctn_vec), function(cost_fctn_idx){
     phi_results <- lapply(phi_mod_types, function(phi_mod_type){
       adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
                   Q_prime_idx=Q_prime_idx, B=B, tau=tau,
                   phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
                   prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
-                  cost_fctn=cost_fctn_list[[cost_fctn_idx]])
+                  cost_fctn=cost_fctn_vec[[cost_fctn_idx]])
     })
     do.call(rbind, phi_results)
   })
