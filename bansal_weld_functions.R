@@ -190,6 +190,7 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
                         cost_fctn="conf_cost", ...){ 
   # Set up index partion of observations that are in/out of oracle query set
   D_test_idx <- 1:nrow(D_test)
+  if(phi_mod_type=="most_uncertain") Q_prime_idx <- order(c_MX)[1:B]
   Q_idx <- Q_prime_idx
   Qc_idx <- make_Qc_index(D_test_idx,Q_idx)
   # initalize utility storage, and make Q and Q-compliment set indeces
@@ -209,22 +210,23 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
   }
   # For each step until we reach budget B:
   P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
-  for (b in (length(Q_prime_idx)+1):B){
-    # find optimal new q observations
-    Sc_idx <- Qc_idx[c_MX[Qc_idx]>tau] #candidates must be of high enough confidence to possibly be UU
-    q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn))]
-    # updated query set
-    Q_idx <- c(Q_idx,q_new_idx)
-    Qc_idx <- make_Qc_index(D_test_idx,Q_idx)
-    # update utility
-    P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
-    utility[b] <- t(get(cost_fctn)(c_MX, phi_D_test)) %*% P_expx_Q
-    # update phi 
-    phi_D_test <- phi_all(D_test, c_MX, true_misclass, Q_idx, tau, prior, phi_mod_type,
-                          clust_out,updateprior, lambda)
-    if(b%%10==0) print(paste("Query",b,"of",B,"Complete"))
+  if(length(Q_prime_idx) < B){
+    for (b in (length(Q_prime_idx)+1):B){
+      # find optimal new q observations
+      Sc_idx <- Qc_idx[c_MX[Qc_idx]>tau] #candidates must be of high enough confidence to possibly be UU
+      q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, cost_fctn))]
+      # updated query set
+      Q_idx <- c(Q_idx,q_new_idx)
+      Qc_idx <- make_Qc_index(D_test_idx,Q_idx)
+      # update utility
+      P_expx_Q <- P_explainx_Q(sim_mat, Q_idx, true_misclass, c_MX, tau)
+      utility[b] <- t(get(cost_fctn)(c_MX, phi_D_test)) %*% P_expx_Q
+      # update phi 
+      phi_D_test <- phi_all(D_test, c_MX, true_misclass, Q_idx, tau, prior, phi_mod_type,
+                            clust_out,updateprior, lambda)
+    }
   }
-  # return(list(Q_idx=Q_idx,utility=utility))
+  print(paste0("phi:",phi_mod_type," with cost:",cost_fctn," Complete"))
   return(data.frame(cost=cost_fctn,
                     phi=phi_mod_type, utility=utility, Q_idx=Q_idx, b=1:B))
 }
@@ -234,7 +236,7 @@ adaptive_query_comparison <- function(phi_mod_types = c("most_uncertain","omnisc
                                       cost_fctn_vec=c("conf_cost"),
                                       D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                       prior=1-c_MX, B=20, tau = .65, sigma=.001,
-                                      clust_max=5,scale=TRUE,  ...){
+                                      clust_max=5,scale=TRUE, ...){
   # apply greedy to all in list
   cost_results_list <-lapply(1:length(cost_fctn_vec), function(cost_fctn_idx){
     phi_results <- lapply(phi_mod_types, function(phi_mod_type){
