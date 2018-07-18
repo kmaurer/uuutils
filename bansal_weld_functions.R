@@ -40,7 +40,8 @@ exp_utility_step_all <- function(Sc_idx, phi_D_test, sim_mat, c_MX, P_expx_Q, co
   # for each candidate evaluate change in utility assuming it is UU, then multiply by phi(x)
   util_s <- sapply(1:length(Sc_idx), function(s){
     P_expx_Qands <- ifelse(sims_Dtest_Sc[,s] > P_expx_Q , sims_Dtest_Sc[,s], P_expx_Q)
-    t(get(cost_fctn)(c_MX,phi_D_test)) %*% P_expx_Qands
+    cost_vals <- get(cost_fctn)(c_MX,phi_D_test)
+    t(cost_vals) %*% P_expx_Qands
   })
   as.vector(phi_D_test[Sc_idx] * util_s)
 }
@@ -67,7 +68,7 @@ UUclust <- function(D_test, c_MX, clust_max=5, clust_set=NULL){
     for(clust in 1:length(conf_clusts$centers)){
       in_clust <- conf_clusts$cluster==clust
       clust_out[in_clust] <- max(clust_out)+
-                              kmeans(D_test[in_clust,], centers=elbow(D_test[in_clust], clust_max))$cluster
+        kmeans(D_test[in_clust,], centers=elbow(D_test[in_clust], clust_max))$cluster
     }
     
     # conf_clusts <- kmeans(c_MX,centers=4)
@@ -151,8 +152,9 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
         phi_D_test <- model_phi(true_misclass, D_test, Q_idx, c_MX, mod_type = phi_mod_type,
                                 prior=prior, tau=tau, updateprior=updateprior, lambda=lambda)
       } else {
-        phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
-                               c_MX, prior=prior, lambda=lambda, tau=tau)
+        phi_D_test <-1-c_MX
+        # phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
+        #                        c_MX, prior=prior, lambda=lambda, tau=tau)
       }
       
     } else if(phi_mod_type == "logistic"){ 
@@ -161,8 +163,9 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
         phi_D_test <- model_phi(true_misclass, D_test, Q_idx, c_MX, mod_type = phi_mod_type, 
                                 prior=prior, tau=tau,updateprior=updateprior, lambda=lambda)
       } else {
-        phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
-                               c_MX, prior=prior, lambda=lambda, tau=tau)
+        phi_D_test <-1-c_MX
+        # phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
+        #                        c_MX, prior=prior, lambda=lambda, tau=tau)
       }
       
     } else if(phi_mod_type == "cluster_prior") {
@@ -205,7 +208,8 @@ adap_greedy <- function(D_test, c_MX, true_misclass, Q_prime_idx, B, tau=.65,
   # calculate and store utility gain in query priming set
   if(length(Q_prime_idx) > 0){
     for (b in 1:length(Q_prime_idx)){
-      utility[b] <- t(get(cost_fctn)(c_MX,phi_D_test)) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau)
+      cost_vals <- get(cost_fctn)(c_MX,phi_D_test)
+      utility[b] <- t(cost_vals) %*% P_explainx_Q(sim_mat, Q_prime_idx[1:b], true_misclass, c_MX, tau)
     }
   }
   # For each step until we reach budget B:
