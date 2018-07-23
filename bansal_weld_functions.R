@@ -244,11 +244,11 @@ adaptive_query_comparison <- function(phi_mod_types = c("most_uncertain","omnisc
   # apply greedy to all in list
   cost_results_list <-lapply(1:length(cost_fctn_vec), function(cost_fctn_idx){
     phi_results <- lapply(phi_mod_types, function(phi_mod_type){
-      adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
-                  Q_prime_idx=Q_prime_idx, B=B, tau=tau,
-                  phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
-                  prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
-                  cost_fctn=cost_fctn_vec[[cost_fctn_idx]])
+        adap_greedy(D_test=D_test, c_MX=c_MX, true_misclass=true_misclass,
+                    Q_prime_idx=Q_prime_idx, B=B, tau=tau,
+                    phi_mod_type=phi_mod_type,clust_max=clust_max,clust_set=NULL, 
+                    prior=prior,sigma=sigma, scale=scale, updateprior=FALSE,lambda=2,
+                    cost_fctn=cost_fctn_vec[[cost_fctn_idx]])
     })
     do.call(rbind, phi_results)
   })

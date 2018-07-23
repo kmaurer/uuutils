@@ -1,4 +1,4 @@
-# setwd("~/Documents/github/uuutils")
+setwd("~/Documents/github/uuutils")
 
 library(ggplot2)
 library(dplyr)
@@ -9,6 +9,8 @@ source("bansal_weld_functions.R")
 conf_cost <- function(c_MX,...)  c_MX 
 sq_cost <- function(c_MX,...) c_MX^2
 step_cost <- function(c_MX,...) (.1*c_MX%/%.1)^4
+
+exp_geom_cost <- function(c_MX,...) log(1/(1-c_MX))
 plot(seq(0,1,.001),step_cost(seq(0,1,.001)))
 # power_cost_diff <- function(c_MX, phi_D_test)  c_MX^2 - (1-phi_D_test)^2
 
@@ -20,20 +22,21 @@ scale=TRUE
 
 # methods to test
 phi_mod_types <- c("rf","logistic","cluster_prior", "most_uncertain","omniscient")
-cost_fctn_vec <- c("conf_cost","sq_cost","step_cost")
+cost_fctn_vec <- c("conf_cost","exp_geom_cost")
 
 #-------------------------------------------------------------------------------
 # load pang04 D_test, c_MX and true_missclass
 load(file="./experiments/pang04config.Rdata")
-B <- nrow(D_test)
+# B <- nrow(D_test)
+B=50
 all_results <- adaptive_query_comparison(phi_mod_types = phi_mod_types,
                                          cost_fctn_vec = cost_fctn_vec,
                                          D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                          prior=1-c_MX, B=B, tau = tau, sigma=sigma,
                                          clust_max=clust_max,scale=scale)
-B=500
+B=100
 random_test <- NULL
-for(i in 1:200){ 
+for(i in 1:20){ 
   sample_idx <- sample(1:nrow(D_test),1000)
   timer <- Sys.time()
   random_test <- rbind(random_test, 
@@ -79,17 +82,17 @@ for(i in 1:200){
 save(all_results,random_test, file="results_pang05.Rdata")
 
 #-------------------------------------------------------------------------------
-# load pang05 D_test, c_MX and true_missclass
 load(file="./experiments/mcauley15config.Rdata")
+c_MX[c_MX == 1] <- .9999999
 B <- nrow(D_test)
 all_results <- adaptive_query_comparison(phi_mod_types = phi_mod_types,
                                          cost_fctn_vec = cost_fctn_vec,
                                          D_test, c_MX, true_misclass, Q_prime_idx = NULL,
                                          prior=1-c_MX, B=B, tau = tau, sigma=sigma,
                                          clust_max=clust_max,scale=scale)
-B=500
+B=50
 random_test <- NULL
-for(i in 1:200){ 
+for(i in 1:20){ 
   sample_idx <- sample(1:nrow(D_test),1000)
   timer <- Sys.time()
   random_test <- rbind(random_test, 
@@ -141,7 +144,7 @@ save(all_results,random_test, file="results_mcauley15.Rdata")
 # 
 # ggplot()+
 #   geom_line(aes(x=b,y=utility,group=phi,
-#                 color=phi), 
+#                 color=phi),
 #             data=all_results, size=1.5)+
 #   facet_grid(cost~.,scales="free_y")+
 #   theme_bw()
