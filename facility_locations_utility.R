@@ -1,5 +1,3 @@
-source("bansal_weld_functions.R")
-
 make_dist_mat <- function(D_test){
   dist_mat <- as.matrix(dist(D_test)) 
   dist_mat / max(dist_mat)
@@ -20,7 +18,7 @@ cost_c_MX <- function(c_MX){
 }
 
 best_candidate <- function(Q_idx, true_misclass, phi_D_test, dist_mat, c_MX, B, alpha=.5){
-  if(is.null(Q_idx)){
+  if(is.null(Q_idx) | length(Q_idx)==0){
     candidates <-1:length(c_MX)
   }else{
     candidates <-(1:length(c_MX))[-Q_idx]
@@ -43,7 +41,7 @@ best_candidate <- function(Q_idx, true_misclass, phi_D_test, dist_mat, c_MX, B, 
 }
 
 fac_loc_utility_algorithm <- function(D_test, c_MX, true_misclass, Q_idx, B=10, tau=.65, prior=rep(.5, length(D_test)), 
-                                    phi_mod_type="rf",clust_out, updateprior=FALSE, lambda=2, alpha=.5){
+                                    phi_mod_type="rf",clust_out, updateprior=FALSE, alpha=.5){
   # define
   dist_mat <- make_dist_mat(D_test)
   utility <- 0 ; reward <- 0 ; sum_min_dist <- 1
@@ -66,34 +64,3 @@ fac_loc_utility_algorithm <- function(D_test, c_MX, true_misclass, Q_idx, B=10, 
                     utility=utility,reward=reward, sum_min_dist =sum_min_dist))
 }
 
-
-# set general parameters
-tau=.65
-sigma=.001
-clust_max=5
-scale=TRUE
-clust_set=NULL
-alpha=.5
-load(file="./experiments/mcauley15config.Rdata")
-# load(file="./experiments/pang04config.Rdata")
-c_MX[c_MX == 1] <- .9999999
-set.seed(1)
-samp_idx <- sample(1:nrow(D_test),1000)
-D_test <- D_test[samp_idx,]
-c_MX <- c_MX[samp_idx]
-true_misclass <- true_misclass[samp_idx]
-clust_out <- UUclust(D_test, c_MX, clust_max=5, clust_set=clust_set)
-B = 200
-phis <- c("rf","logistic","cluster_prior","omniscient","most_uncertain")
-# run query with fac location utility using several phi's
-res_list <- lapply(phis, function(phi){
-  fac_loc_utility_algorithm(D_test, c_MX, true_misclass, Q_idx, B=B,tau=.65, prior=rep(.5, length(D_test)), 
-                          phi_mod_type=phi,clust_out, updateprior=FALSE, lambda=2, alpha=alpha)
-})
-fl_util_results <- do.call(rbind,res_list)
-
-library(ggplot2)
-ggplot()+
-  geom_line(aes(x=b,y=utility, color=phi),
-            data=fl_util_results ,size=1.5)+
-  theme_bw()
