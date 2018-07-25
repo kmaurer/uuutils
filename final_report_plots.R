@@ -161,9 +161,9 @@ for (dataset in datasetvec){
 head(all_overconfidence)
 tail(all_overconfidence)
 
-labels_data <- data.frame(x=c(.65,.73,.99),y=c(.05,.08,.022),
+labels_data <- data.frame(x=c(.65,.73,.99,.93),y=c(.05,.08,.022,.15),
                           data_source=datasetvec,
-                          hjust=c(0,.5,1),
+                          hjust=c(0,.5,1,.6),
                           label=c("worst \noverconfidence"))
 
 all_overconfidence_plots <- ggplot()+
