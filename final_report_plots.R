@@ -99,7 +99,7 @@ overconfidence_plot
 #=====================================================================================
 # combine all data tests results
 
-datasetvec <- c("pang04","pang05","mcauley15")
+datasetvec <- c("pang04","pang05","mcauley15","kaggle14")
 all_random_test <- NULL
 for (dataset in datasetvec){
   load(file=paste0("experiments/results_fl_",dataset,".Rdata"))
