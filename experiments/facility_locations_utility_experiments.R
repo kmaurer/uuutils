@@ -139,12 +139,12 @@ for(i in 1:Iterations){
   random_test <- rbind(random_test, fl_util_results )    
   print(paste("Done with iteration",i)) 
 } 
-# save(random_test, file="results_fl_furcolor.Rdata")
+# save(random_test, file="results_fl_kaggle14.Rdata")
 
 #=====================================================================================
 # combine all data tests results
 
-datasetvec <- c("pang04","pang05","mcauley15","furcolor")
+datasetvec <- c("pang04","pang05","mcauley15","kaggle14")
 all_random_test <- NULL
 for (dataset in datasetvec){
   load(file=paste0("results_fl_",dataset,".Rdata"))
