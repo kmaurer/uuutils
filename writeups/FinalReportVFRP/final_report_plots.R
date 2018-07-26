@@ -2,9 +2,11 @@ library(ggplot2)
 library(dplyr)
 library(gridExtra)
 
+setwd("~/GitHub/uuutils/writeups/FinalReportVFRP")
+
 #-----------------------------------------------------
 # Demonstrate how coverage-based utility model favors most uncertain
-load("experiments/results_mcauley15.Rdata")
+load("~/GitHub/uuutils/experiments/results_mcauley15.Rdata")
 
 monte_carlo_envelope <- random_test  %>%
   group_by(cost, b,iteration) %>%
@@ -26,13 +28,8 @@ ggplot()+
   group=phi, color=algo,fill=algo),linetype=2,
               alpha=.04,
               data=monte_carlo_envelope)+
-  # geom_ribbon(aes(x=b,ymin=q1,ymax=q3,
-  #                 group=phi, fill=phi),
-  #             alpha=.25,
-  #             data=monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo),
             data=monte_carlo_envelope,size=1.5)+
-  # facet_grid(.~phi, scales="free_y")+
   scale_color_manual("Algorithm:", values=c("red","black"))+
   scale_fill_manual("Algorithm:", values=c("red","black"))+
   theme_bw()+
@@ -44,7 +41,7 @@ ggplot()+
 #-------------------------------------------------------------------------------
 # Showing where model is overconfident
 
-load(file="./experiments/mcauley15config.Rdata")
+load(file="~/GitHub/uuutils/experiments/mcauley15config.Rdata")
 c_MX[c_MX == 1] <- .9999999
 
 # create cubic splines model to fit rate of correct class as function of confidence
@@ -102,7 +99,7 @@ overconfidence_plot
 datasetvec <- c("pang04","pang05","mcauley15","kaggle14")
 all_random_test <- NULL
 for (dataset in datasetvec){
-  load(file=paste0("experiments/results_fl_",dataset,".Rdata"))
+  load(file=paste0("~/GitHub/uuutils/experiments/results_fl_",dataset,".Rdata"))
   all_random_test <- rbind(all_random_test,
                            data.frame(random_test,data_source=dataset))
 }
@@ -131,10 +128,6 @@ all_envelopes <- ggplot()+
                   group=phi, color=algo,fill=algo),linetype=2,
               alpha=.04,
               data=monte_carlo_envelope)+
-  # geom_ribbon(aes(x=b,ymin=q1,ymax=q3,
-  #                 group=phi, fill=phi),
-  #             alpha=.25,
-  #             data=monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo),
             data=monte_carlo_envelope,size=1.5)+
   facet_grid(data_source~., scales="free_y")+
@@ -151,7 +144,7 @@ all_envelopes
 datasetvec <- c("pang04","pang05","mcauley15","kaggle14")
 all_overconfidence <- NULL
 for (dataset in datasetvec){
-  load(file=paste0("experiments/",dataset,"config.Rdata"))
+  load(file=paste0("~/GitHub/uuutils/experiments/",dataset,"config.Rdata"))
   mod <- lm(1-true_misclass ~ splines::bs(c_MX, 3))
   all_overconfidence <- rbind(all_overconfidence,
                               data.frame(c_MX =c_MX,
