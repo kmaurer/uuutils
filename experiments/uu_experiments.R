@@ -4,13 +4,16 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 source("bansal_weld_functions.R")
+source("phi_functions.R")
 
 # define cost functions to test
 conf_cost <- function(c_MX,...)  c_MX 
 sq_cost <- function(c_MX,...) c_MX^2
 step_cost <- function(c_MX,...) (.1*c_MX%/%.1)^4
 
+#!# might be good idea to test if our confidence reward function will work within their construction 
 exp_geom_cost <- function(c_MX,...) log(1/(1-c_MX))
+
 plot(seq(0,1,.001),step_cost(seq(0,1,.001)))
 # power_cost_diff <- function(c_MX, phi_D_test)  c_MX^2 - (1-phi_D_test)^2
 

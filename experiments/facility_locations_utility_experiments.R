@@ -8,6 +8,7 @@ library(dplyr)
 library(tidyr)
 source("~/Documents/github/uuutils/bansal_weld_functions.R")
 source("~/Documents/github/uuutils/facility_locations_utility.R")
+source("~/Documents/github/uuutils/phi_functions.R")
 
 # set general parameters
 tau=.65

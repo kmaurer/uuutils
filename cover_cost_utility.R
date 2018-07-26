@@ -1,3 +1,6 @@
+### orphaned code of previous utility idea ###
+# likely to be deleted in as project runs with facility locations instead
+
 make_dist_mat <- function(D_test){
   dist_mat <- as.matrix(dist(D_test)) 
   dist_mat / max(dist_mat)
