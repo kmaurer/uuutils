@@ -95,6 +95,7 @@ for(i in 1:Iterations){
 
 
 #--------------------------------------------------------------------------------------------
+### Process for recreating approximation to the kaggle13 data used by Bansal and Weld with furcolor data
 # dat <- read.csv("/home/walter/Documents/karsten/poster/out.csv", header=T)
 # # create columns for prediction name and misclassification indicator
 # dat$pred <- ifelse(dat$PredictedClass==1,"dog","cat")
