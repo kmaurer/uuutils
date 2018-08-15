@@ -36,27 +36,10 @@
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
 
-<<setup,echo=F,include=F,eval=T>>=
-# options(scipen=5, digits=5)
-
-# libraries
-library(iqbin)
-library(FNN)
-library(tidyverse)
-library(stringr)
-library(randomForest)
-library(RANN)
-library(mvtnorm)
-library(gridExtra)
-library(xtable)
-
-# source in functions
-@
 \newcommand{\km}[1]{{\color{red} #1}} %red comments: Karsten
 \newcommand{\wb}[1]{{\color{blue} #1}} %blue comments: Walter
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 % The file aaai.sty is the style file for AAAI Press 
 % proceedings, working notes, and technical reports.
 %
@@ -77,7 +60,7 @@ Techniques such as active learning \citep{Settles2010} and domain adaptation \ci
 
 Intuitive methods can be used to evaluate the performance of a model in the absence of labeled data.  Given a labeling budget one could sample instances following an experimental design, sample instances with the lowest classifier confidence, or sample instances identified as informative to the classifier through active learning strategies.  These methods could provide a sense of a model's performance but will potentially miss high confidence mistakes, referred to as \textit{unknown unknowns}.     
 
-Unknown unknowns can be thought of as blind spots to a classification model, and can be caused by dataset bias during training, domain shift during use, lack of model expressibility, and other causes of poor model fit.  From the viewpoint of a rational actor, unknown unknowns represent costly mistakes because minimal risk mitigation strategies will have been deployed for these high confidence predictions.  The discovery of unknown unknowns may allow new mitigation strategies to be formulated \citep{Nushi2016a}.  Additionally, as enumerated in \citep{Bansal2018}, finding unknown unknowns is valuable to understand classifier limitations and prevent attacks (stole this hard) \km{what do you mean by attacks?}. 
+Unknown unknowns can be thought of as blind spots to a classification model, and can be caused by dataset bias during training, domain shift during use, lack of model expressibility, and other causes of poor model fit.  From the viewpoint of a rational actor, unknown unknowns represent costly mistakes because minimal risk mitigation strategies will have been deployed for these high confidence predictions.  The discovery of unknown unknowns may allow new mitigation strategies to be formulated \citep{Nushi2016a}.  Additionally, as enumerated in \citep{Bansal2018}, finding unknown unknowns is valuable to understand classifier limitations and prevent attacks (stole this hard) what do you mean by attacks?. 
 
 \citet{Attenberg2015} gamified the search for unknown unknowns and relied on human oracles to discover misclassified instances. A utility-based search algorithm for discovering unknown unknowns was then proposed by \citet{Lakkaraju2016} and expanded upon by \citet{Bansal2018}. \citet{Lakkaraju2016} uses a utility model that simply counts the number of discovered unknown unknowns and searches using multi-armed bandits. \citet{Bansal2018} argued that this unit utility model motivates the discovery of very similar unknown unknowns. To fix this problem they proposed an adaptive coverage-based utility model that attempts to encourage the discovery of unknown unknowns throughout the feature space, favoring high confidence regions. They then search for unknown unknowns via a greedy algorithm to maximize utility. 
 
@@ -92,14 +75,10 @@ What we find wrong...
 
 \section{Problem Formulation}
 
-<<chunkdemo,echo=F, eval=TRUE, include=TRUE>>=
-ggplot() + geom_point(aes(x=1:10,y=1:10))
-ggsave("../experimentsAndPlots/demoplot.png",dpi=500,height=2,width=2,units="in")
-@
 
 \begin{figure}[hbtp]
 \centering
-  \includegraphics[width=.49\textwidth]{../experimentsAndPlots/demoplot.png}
+  \includegraphics[width=.4\textwidth]{../experimentsAndPlots/demoplot.png}
   \caption{Demo Plot Built in Code Chunk}
   \label{fig:demo}
 \end{figure}
@@ -144,12 +123,9 @@ $r\left(c_x\right) = \log\left(\frac{1}{1-c_x}\right)$
 
 
 \newpage
-\bibliographystyle{aaai.bst}
+\bibliographystyle{aaai}
 
 \bibliography{library}
-
-
-
 
 
 
