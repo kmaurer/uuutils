@@ -76,19 +76,13 @@ What we find wrong...
 \section{Problem Formulation}
 
 
-\begin{figure}[hbtp]
-\centering
-  \includegraphics[width=.4\textwidth]{../experimentsAndPlots/demoplot.png}
-  \caption{Demo Plot Built in Code Chunk}
-  \label{fig:demo}
-\end{figure}
-
 \section{Methodology}
+
+We propose an alternative utility model based roughly on facility location optimization methods  \textbf{(Farahani and Hekmatfar, 2009)}. In the facility location problem a utility can be constructed that uses a greedy algorithm to minimize the cost, or maximize the reward, of building a series of new facilities in a supply chain, while also minimizing distances between clients to the nearest facility  \textbf{(Guha and Khuller, 1999; Arya et al., 2004)}. In the UU query setting, we can draw an analog to the selection of a point to query to the establishment of a facility at that location in the feature space; evaluating the reward for selecting the point, and the distance it stands from the surrounding unobserved points. We propose a facility location utility function as: 
 
 $$W(Q) = \sum_{x \in S} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S}\left(d\left(x,q\right)\right)$$
 
-$r\left(c_x\right) = \log\left(\frac{1}{1-c_x}\right)$
-
+where $r\left(c_x\right) = \log\left(\frac{1}{1-c_x}\right)$ is the reward function for finding an UU with confidence $c_{x}$, and $d(x,q)$ is the Euclidean distance between points $x$ and $q$. We use the greedy algorithm that at each iteration selects $q'$ with the maximum expected utility, as defined in Algorithm 1 below. 
 
 %	FISTA with separation
 \begin{algorithm}
@@ -112,6 +106,25 @@ $r\left(c_x\right) = \log\left(\frac{1}{1-c_x}\right)$
 	\end{algorithmic}
 \end{algorithm}
 
+At each iterative step in Algorithm 1, we need to select the point that will maximize the expected gain in facility location utility, given probability estimates for point misclassification, such that  $\hat{\phi}(q' | Q) = \hat{P}(y_{q'} \ne M(q' ) |  Q )$. To find the expected gain in utility for each point, we evaluate the utility under the possibilities that the point is either misclassified or correctly classified. These possible utility outcomes are then averaged with weights equal to the estimated probability of each outcome. Thus the optimization step requires the solution of the following:
+
+$$\underset{q' \notin Q}{argmax} E[W(Q \cup q')] = $$
+\begin{equation*}
+\small
+\underset{q' \notin Q}{argmax} \left[\begin{split}
+\hat{\phi}(q') \cdot \left[\sum_{x \in S \cup q'} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S \cup q'}\left(d\left(x,q\right)\right) \right] + \\ 
+(1-\hat{\phi}(q')) \cdot \left[\sum_{x \in S} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S}\left(d\left(x,q\right)\right)\right]  
+\end{split}\right]
+\end{equation*}
+\normalsize \\
+
+Note that $\left[\sum_{x \in S} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S}\left(d\left(x,q\right)\right)\right]$ is constant for all considered points, but cannot simply be removed from the argmax solution because it is multiplied by an estimated probability that is unique to each point. 
+
+There are several characteristics to note in the design of the facility locations utility model. First, the rewards are only accumulated by finding UUs in the query set, this avoids the issue of placing value on points in the test set for simply having high confidence points; whereas having a small average minimum distance between all test points to their closest observed UU is also seen as valuable for encouraging strong coverage by the query set. 
+
+The reward function is designed to impact the utility in a way that is consistent with a limiting factor being the budget for oracle queries. Viewed as a geometric distribution problem with a probability $\phi(x)$ of discovering a UU, we expect to need 1/$\phi(x)$ queried points before discovering the first UU \textbf{(Casella and Berger, 2002)}. For heuristic insight into the reward behavior construction, if we assume that   $\phi(x) ~= (1-c_x )$, then our reward is a log-scaled count of the number of randomly selected points we would expect to query in order to find the UUs in our query set. The higher this number becomes, the more efficient our search was. We use the log scaling to avoid over-incentivizing the search for incredibly rare UUs, as we know there is a limited budget for oracle queries. While seemingly convoluted, it avoids an important pitfall of summing the confidences directly, where we would inherently incentivize the most-uncertain search pattern by default. As an example, suppose we have a budget of ten oracle queries: if we select all points with $(1-c_x )=0.7$ then we might expect to find three UUs – thus gain a reward of 2.1; as opposed to when $(1-c_x )=0.9$ then we expect to find only one – thus gain a reward of 0.9. Under the proposed reward function for this example, we expect an equal reward for finding the expected number of UUs given their confidence: $3\cdot r(.7)=1\cdot r(.9)=10$. The optimization step will provide the highest expected reward for selecting the most overconfident point relative to the updated probability estimates, that is to say when %(1-c_Mx )<< \hat{\phi}(x)$. Note that unlike the UU definition, this construction does not depend on the arbitrary definition of a confidence threshold, τ, beyond which we search for misclassifications. The reward component of the facility locations utility should encourage the query set to select any points where the model is most overconfident.
+
+In addition to a change to the utility structure, we have explored the use of alternative model-based estimates for $\hat{\phi}(x)$. In this paper we demonstrate the use of logistic regression classifiers as alternatives to the cluster-based probabilities used in  \textbf{Bansal and Weld’s (2018)} adaptive greedy algorithm.  
 
 
 \section{Experimental Evaluation}
@@ -126,8 +139,6 @@ $r\left(c_x\right) = \log\left(\frac{1}{1-c_x}\right)$
 \bibliographystyle{aaai}
 
 \bibliography{library}
-
-
 
 
 \end{document}
