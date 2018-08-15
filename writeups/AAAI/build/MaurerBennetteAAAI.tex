@@ -17,6 +17,7 @@
 \usepackage{bbm}
 \usepackage{latexsym}
 \usepackage{mathtools}
+\usepackage{color}
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -60,7 +61,7 @@ Techniques such as active learning \citep{Settles2010} and domain adaptation \ci
 
 Intuitive methods can be used to evaluate the performance of a model in the absence of labeled data.  Given a labeling budget one could sample instances following an experimental design, sample instances with the lowest classifier confidence, or sample instances identified as informative to the classifier through active learning strategies.  These methods could provide a sense of a model's performance but will potentially miss high confidence mistakes, referred to as \textit{unknown unknowns}.     
 
-Unknown unknowns can be thought of as blind spots to a classification model, and can be caused by dataset bias during training, domain shift during use, lack of model expressibility, and other causes of poor model fit.  From the viewpoint of a rational actor, unknown unknowns represent costly mistakes because minimal risk mitigation strategies will have been deployed for these high confidence predictions.  The discovery of unknown unknowns may allow new mitigation strategies to be formulated \citep{Nushi2016a}.  Additionally, as enumerated in \citep{Bansal2018}, finding unknown unknowns is valuable to understand classifier limitations and prevent attacks (stole this hard) what do you mean by attacks?. 
+Unknown unknowns can be thought of as blind spots to a classification model, and can be caused by dataset bias during training, domain shift during use, lack of model expressibility, and other causes of poor model fit.  From the viewpoint of a rational actor, unknown unknowns represent costly mistakes because minimal risk mitigation strategies will have been deployed for these high confidence predictions.  The discovery of unknown unknowns may allow new mitigation strategies to be formulated \citep{Nushi2016a}.  Additionally, as enumerated in \citep{Bansal2018}, finding unknown unknowns is valuable to understand classifier limitations and prevent attacks (stole this hard) \km{what do you mean by attacks?}
 
 \citet{Attenberg2015} gamified the search for unknown unknowns and relied on human oracles to discover misclassified instances. A utility-based search algorithm for discovering unknown unknowns was then proposed by \citet{Lakkaraju2016} and expanded upon by \citet{Bansal2018}. \citet{Lakkaraju2016} uses a utility model that simply counts the number of discovered unknown unknowns and searches using multi-armed bandits. \citet{Bansal2018} argued that this unit utility model motivates the discovery of very similar unknown unknowns. To fix this problem they proposed an adaptive coverage-based utility model that attempts to encourage the discovery of unknown unknowns throughout the feature space, favoring high confidence regions. They then search for unknown unknowns via a greedy algorithm to maximize utility. 
 
@@ -68,6 +69,11 @@ The utility in \citet{Bansal2018} has the form: $$U(Q) = \sum_{x \in \mathbb{X}}
 
 Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by sequentially querying the instances for which the classifier is most uncertain, as shown in Figure \cite{something}.  We believe this exposes a flaw in the coverage-based utility model.  That is, the coverage-based utility model rewards the discovery of misclassified instances in close proximity to instances for which the classifier has high confidence.  This reward strategy would help find high confidence unknown unknowns if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.
 
+\begin{figure}[hbtp]
+  \includegraphics[width=.4\textwidth]{../experimentsAndPlots/CoverageVsMostUncertainPlaceholder.png}
+  \caption{Empirical evidence that Coverage-Based Utility reward low confidence search.}
+  \label{fig:coverutil}
+\end{figure}
 
 
 
@@ -116,7 +122,7 @@ $$\underset{q' \notin Q}{argmax} E[W(Q \cup q')] = $$
 (1-\hat{\phi}(q')) \cdot \left[\sum_{x \in S} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S}\left(d\left(x,q\right)\right)\right]  
 \end{split}\right]
 \end{equation*}
-\normalsize \\
+\normalsize
 
 Note that $\left[\sum_{x \in S} r \left(c_x\right) - \frac{1}{n} \sum_{x \in \mathbb{X}} \min_{q \in S}\left(d\left(x,q\right)\right)\right]$ is constant for all considered points, but cannot simply be removed from the argmax solution because it is multiplied by an estimated probability that is unique to each point. 
 
