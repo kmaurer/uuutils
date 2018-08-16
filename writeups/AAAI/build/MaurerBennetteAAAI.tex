@@ -67,7 +67,7 @@ Unknown unknowns can be thought of as blind spots to a classification model, and
 
 The utility in \citet{Bansal2018} has the form: $$U(Q) = \sum_{x \in \mathbb{X}} c_x \cdot \max_{q \in S} \left\{sim\left(x,q \right) \right\}$$ where $\mathbb{X} \subset \mathbb{R}^p$ is the set of available $p$-dimensional unlabeled test instances, $Q \subset \mathbb{X}$ is the set of instances labeled by an oracle, $S = \left\{x|x \in Q, y_x \neq M(x)\right\}$ is the set of discovered unknowns unknowns for some classifier $M(x):\mathbb{X} \rightarrow class$, $c_x$ is the classifier's confidence in its prediction of $x$, and $sim(x,q)$ is a distance based similarity metric.  The instance $q'$ that maximizes the expected utility increase is greedily selected to be labeled by the oracle $$E\left[U_x\left(Q \cup q'\right)\right] = \hat{\phi}(x) \cdot c_x \cdot \max_{q \in S \cup q'} \left\{sim\left(x,q \right) \right\}$$ where $\hat{\phi}(x) = P\left(y_x \neq M(x) |Q \right)$ is a conditional probability that $x$ is misclassified given the query set.  As previously stated, this method is designed to incentivize a broader search for unknown unknowns and gives higher utility for finding misclassifications in higher confidence regions.  
 
-Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by sequentially querying the instances for which the classifier is most uncertain, as shown in Figure \cite{something}.  We believe this exposes a flaw in the coverage-based utility model.  That is, the coverage-based utility model rewards the discovery of misclassified instances in close proximity to instances for which the classifier has high confidence.  This reward strategy would help find high confidence unknown unknowns if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.
+Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by sequentially querying the instances for which the classifier is most uncertain. Query results were collected under the two search algorithms across 100 random samples of size n=1000 from each set of test data, with budget of B=100 quieries, because the greedy algorithms can unfold with high variability depending on the points gathered for testing. Figure~\ref{fig:coverutil} displays the Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical data sets used in \citet{Bansal2018}. We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point.  We believe this exposes a flaw in the coverage-based utility model.  We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point. This reward strategy would help find high confidence unknown unknowns if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.
 
 \begin{figure}[hbtp]
   \includegraphics[width=.45\textwidth]{../experimentsAndPlots/CoverageVsMostUncertainPlaceholder.png}
@@ -75,18 +75,7 @@ Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by 
   \label{fig:coverutil}
 \end{figure}
 
-
-\begin{figure}[hbtp]
-  \includegraphics[width=.45\textwidth]{../experimentsAndPlots/overconfidence.png}
-  \caption{Observed overconfidence of the model for experimental data sets.}
-  \label{fig:coverutil}
-\end{figure}
-
-
-What we find wrong...
-
-\section{Problem Formulation}
-
+We believe that this behavior occurs because the coverage-based utility model attributes high utility for all high confidence points in the test set that are close to any discovered UU, thus attributing a utility to the uncertain status of non-queried points and even to points that have been confirmed by the oracle query to not be UU. Suppose that a single misclassified point exists in a region of high confident predictions, the utility would increase substantially for the surrounding points, despite not being UU. 
 
 \section{Methodology}
 
@@ -136,6 +125,14 @@ There are several characteristics to note in the design of the facility location
 
 The reward function is designed to impact the utility in a way that is consistent with a limiting factor being the budget for oracle queries. Viewed as a geometric distribution problem with a probability $\phi(x)$ of discovering a UU, we expect to need 1/$\phi(x)$ queried points before discovering the first UU \km{(Casella and Berger, 2002)}. For heuristic insight into the reward behavior construction, if we assume that   $\phi(x) ~= (1-c_x )$, then our reward is a log-scaled count of the number of randomly selected points we would expect to query in order to find the UUs in our query set. The higher this number becomes, the more efficient our search was. We use the log scaling to avoid over-incentivizing the search for incredibly rare UUs, as we know there is a limited budget for oracle queries. While seemingly convoluted, it avoids an important pitfall of summing the confidences directly, where we would inherently incentivize the most-uncertain search pattern by default. As an example, suppose we have a budget of ten oracle queries: if we select all points with $(1-c_x )=0.7$ then we might expect to find three UUs – thus gain a reward of 2.1; as opposed to when $(1-c_x )=0.9$ then we expect to find only one – thus gain a reward of 0.9. Under the proposed reward function for this example, we expect an equal reward for finding the expected number of UUs given their confidence: $3\cdot r(.7)=1\cdot r(.9)=10$. The optimization step will provide the highest expected reward for selecting the most overconfident point relative to the updated probability estimates, that is to say when %(1-c_Mx )<< \hat{\phi}(x)$. Note that unlike the UU definition, this construction does not depend on the arbitrary definition of a confidence threshold, τ, beyond which we search for misclassifications. The reward component of the facility locations utility should encourage the query set to select any points where the model is most overconfident.
 
+ Figure~\ref{fig:overconf} displays the overconfidence of the models– the difference between the confidence values and the observed rates of correct classification – where we fit a cubic-splines to each full test dataset to obtain an empirical estimates of the true rates. We see that the models from the Pang04 and Pang05 datasets are most overconfident for points with relatively low confidence values, whereas the predictions for McCauley15 and Kaggle14 are most overconfident in the highest confidence range. 
+
+\begin{figure}[hbtp]
+  \includegraphics[width=.45\textwidth]{../experimentsAndPlots/overconfidence.png}
+  \caption{Observed overconfidence of the model for experimental data sets.}
+  \label{fig:overconf}
+\end{figure}
+
 In addition to a change to the utility structure, we have explored the use of alternative model-based estimates for $\hat{\phi}(x)$. In this paper we demonstrate the use of logistic regression classifiers as alternatives to the cluster-based probabilities used in  \textbf{Bansal and Weld’s (2018)} adaptive greedy algorithm.  
 
 
@@ -144,14 +141,14 @@ In addition to a change to the utility structure, we have explored the use of al
 \begin{figure}[hbtp]
   \includegraphics[width=.45\textwidth]{../experimentsAndPlots/flUtilPlaceholder.png}
   \caption{Faciltiy Locations Utility rewards finding overconfidence.}
-  \label{fig:coverutil}
+  \label{fig:flutil}
 \end{figure}
 
 
 \begin{figure}[hbtp]
   \includegraphics[width=.45\textwidth]{../experimentsAndPlots/discoveryRatioPlaceholder.png}
   \caption{Misclassification Discovery Ratio.}
-  \label{fig:coverutil}
+  \label{fig:discratio}
 \end{figure}
 
 
