@@ -163,17 +163,39 @@ all_overconfidence_plots <- ggplot()+
   geom_line(aes(x=c_MX,y=overconfidence),color="darkorange",
             size=1.5, data=all_overconfidence)+
   geom_hline(yintercept = 0)+
-  geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
-            color="darkorange")+
+  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
+  #           color="darkorange")+
   facet_grid(data_source~., scales="free_y")+
   theme_bw()+
   labs(x=expression("c"[Mx]), y="Overconfidence")+
   theme(plot.margin = unit(c(.2,.5,.2,.2), "cm"))
 all_overconfidence_plots
 
+ggplot()+
+  geom_line(aes(x=c_MX,y=overconfidence),color="darkorange",
+            size=1.5, data=all_overconfidence)+
+  geom_hline(yintercept = 0)+
+  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
+  #           color="darkorange")+
+  facet_grid(data_source~., scales="free_y")+
+  theme_bw()+
+  labs(x=expression("c"[Mx]), y="Overconfidence")+
+  theme(plot.margin = unit(c(.2,.5,.2,.2), "cm"))
 
 allplots <- grid.arrange(all_overconfidence_plots,all_envelopes,
                          nrow=1,widths=c(.42,.58))
 ggsave(filename="allplotsFL.png", plot=allplots,
        width=11, height=11, units="in",
        dpi=600)
+
+
+#-------------------------------------------------------------
+overconf_faceted <- ggplot()+
+  geom_line(aes(x=c_MX,y=overconfidence),
+            size=1, data=all_overconfidence)+
+  geom_hline(yintercept = 0)+
+  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
+  #           color="darkorange")+
+  facet_grid(.~data_source)+
+  theme_bw()+
+  labs(x=expression("c"[Mx]), y="Overconfidence")
