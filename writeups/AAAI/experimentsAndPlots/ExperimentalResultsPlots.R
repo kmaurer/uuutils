@@ -39,7 +39,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600)
+ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
+       height=6,width=4.5,units="in")
 
 #------------------------------------------------------------------------------
 
@@ -80,7 +81,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-ggsave("flUtilPlaceholder.png", dpi=600)
+ggsave("flUtilPlaceholder.png", dpi=600,
+       height=6,width=4.5,units="in")
 
 #-------------------------------------------------------------------------------
 #  Standardized mortality ratio style comparison 
@@ -92,9 +94,9 @@ bw_smr <- bw_results %>%
                      labels=c("Coverage-Based","Most Uncertain")),
          smr = found/(B-cumulativeConfidence)) %>%
   group_by(dataset, algo) %>%
-  summarize(smrLower95 = quantile(smr,.025),
+  summarize(smrLower = quantile(smr,.05),
             smrMedian = quantile(smr,.5),
-            smrUpper95 = quantile(smr,.975))
+            smrUpper = quantile(smr,.95))
 bw_smr
 
 mb_smr <- mb_results %>%
@@ -103,9 +105,9 @@ mb_smr <- mb_results %>%
                        labels=c("Cluster FL","Facility Locations","Most Uncertain")),
          smr = found/(B-cumulativeConfidence)) %>%
   group_by(dataset, algo) %>%
-  summarize(smrLower95 = quantile(smr,.025),
+  summarize(smrLower = quantile(smr,.05),
             smrMedian = quantile(smr,.5),
-            smrUpper95 = quantile(smr,.975)) 
+            smrUpper = quantile(smr,.95)) 
 
 
 smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
@@ -116,7 +118,7 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
                           labels=c("pang04","pang05","mcauley15")) )
 
 ggplot() +
-  geom_errorbar(aes(ymin=smrLower95,ymax=smrUpper95,
+  geom_errorbar(aes(ymin=smrLower,ymax=smrUpper,
                     color=algo, x=dataset),width=.5,
                 position = "dodge", data=smr, size=1) +
   geom_point(aes(y=smrMedian, color=algo, x=dataset),
@@ -125,12 +127,18 @@ ggplot() +
   scale_color_manual("Algorithm:", values=algo_colors) +
   geom_hline(yintercept = 1) +
   scale_y_continuous(breaks=seq(0,10,2), 
-                     limits=c(0,max(smr$smrUpper95))) +
-  theme_bw() 
+                     limits=c(0,max(smr$smrUpper))) +
+  labs(y="Misclassification Discovery Ratio \n Found : Expected",
+       x="") +
+  theme_bw() +
+  theme(legend.position = c(.65,.35),
+        axis.text.y= element_text(angle=90, hjust=.5))+
+  coord_flip()
 
+ggsave("discoveryRatioPlaceholder.png", dpi=600, 
+       height=4,width=4.5,units="in")
 
-
-
+#--------------------------------------------------------------------------------------------------------------------
 
 bw_conf <- bw_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
