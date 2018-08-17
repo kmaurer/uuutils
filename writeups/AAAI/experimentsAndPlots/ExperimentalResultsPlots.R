@@ -30,7 +30,7 @@ ggplot()+
               data=bw_monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo),
             data=bw_monte_carlo_envelope,size=1.5)+
-  facet_grid(dataset~., scales="free_y")+
+  facet_wrap(~dataset, scales="free_y",nrow=2)+
   scale_color_manual("Algorithm:", values=algo_colors[c(1,2)])+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,2)])+
   theme_bw()+
@@ -40,7 +40,7 @@ ggplot()+
         legend.position = "bottom")
 
 ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
-       height=6,width=4.5,units="in")
+       height=5,width=7,units="in")
 
 #------------------------------------------------------------------------------
 
@@ -67,11 +67,12 @@ monte_carlo_envelope <- mb_results  %>%
         
 ggplot()+
   geom_ribbon(aes(x=b,ymin=lower,ymax=upper,
-                  group=algo, color=algo,fill=algo),linetype=2,
-              alpha=.04,
+                  group=algo, color=algo,fill=algo, 
+                  linetype=algo),size=1
+              alpha=.1,
               data=monte_carlo_envelope)+
-  geom_line(aes(x=b,y=median, color=algo),
-            data=monte_carlo_envelope,size=1.5)+
+  geom_line(aes(x=b,y=median, color=algo,linetype=algo),
+            data=monte_carlo_envelope,size=1)+
   facet_grid(dataset~., scales="free_y")+
   scale_color_manual("Algorithm:", values=algo_colors[c(1,3)])+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
@@ -82,7 +83,7 @@ ggplot()+
         legend.position = "bottom")
 
 ggsave("flUtilPlaceholder.png", dpi=600,
-       height=6,width=4.5,units="in")
+       height=6,width=3.75,units="in")
 
 #-------------------------------------------------------------------------------
 #  Standardized mortality ratio style comparison 
