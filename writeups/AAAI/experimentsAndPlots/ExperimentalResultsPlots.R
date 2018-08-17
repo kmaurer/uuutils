@@ -115,7 +115,19 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Coverage-Based","Facility Locations")),
          dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
-                          labels=c("pang04","pang05","mcauley15")) )
+                          labels=c("pang04","pang05","mcauley15")) ) 
+
+smr_table <- smr %>%
+  mutate(value = paste0(round(smrMedian,2)," (",round(smrLower,2),",",round(smrUpper,2),")")) %>%
+  select(dataset,algo,value) %>%
+  spread(key=algo, value=value)
+smr_table
+library(xtable)
+
+print(xtable(smr_table), include.rownames=FALSE)
+
+
+
 
 ggplot() +
   geom_errorbar(aes(ymin=smrLower,ymax=smrUpper,
@@ -136,7 +148,7 @@ ggplot() +
   coord_flip()
 
 ggsave("discoveryRatioPlaceholder.png", dpi=600, 
-       height=4,width=4.5,units="in")
+       height=3,width=4.5,units="in")
 
 #--------------------------------------------------------------------------------------------------------------------
 

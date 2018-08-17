@@ -132,9 +132,12 @@ There are a few characteristics to note in the design of the facility locations 
 
 The reward function is designed to impact the utility in a way that is consistent with a limiting factor being the budget for oracle queries. Viewed as a geometric distribution problem with a probability $\phi(x)$ of discovering a UU, we expect to need 1/$\phi(x)$ queried points like point $x$ before discovering the first UU \km{(Casella and Berger, 2002)}. For heuristic insight into the reward behavior construction, if we assume that   $\phi(x) ~= (1-c_x )$, then our reward is a log-scaled count of the number of randomly selected points we would expect to query in order to find the UUs in our query set. We use the log scaling to avoid over-incentivizing the search for incredibly rare UUs, as we know there is a limited budget for oracle queries. The optimization step will provide the highest expected rewards for selecting the most overconfident points relative to the updated probability estimates, that is to say when $(1-c_x )< \hat{\phi}(x)$. Note that unlike the UU definition, this construction does not depend on the arbitrary definition of a confidence threshold, $\tau$, beyond which we search for misclassifications. The reward component of the facility locations utility should encourage the query set to select any points where the model is most overconfident. We define \textit{overconfidence} as the difference between the confidence values given by the classifier and the actual rates of correct classification. 
 
-%The reward function avoids an important pitfall of summing the confidence values directly, where we would incentivize the most-uncertain search pattern by default. As an example, suppose we have a budget of ten oracle queries: if we select all points with $(1-c_x )=0.7$ then we might expect to find three UUs – thus gain a summed confidence reward of 2.1; as opposed to when $(1-c_x )=0.9$ then we expect to find only one – thus gain a summed confidence reward of 0.9. Under the proposed reward function for this example, we expect an equal reward for finding the expected number of UUs given their confidence: $3\cdot r(.7)=1\cdot r(.9)=10$. The optimization step will provide the highest expected reward for selecting the most overconfident point relative to the updated probability estimates, that is to say when %(1-c_Mx )< \phi(x)$. Note that unlike the UU definition, this construction does not depend on the arbitrary definition of a confidence threshold, τ, beyond which we search for misclassifications. The reward component of the facility locations utility should encourage the query set to select any points where the model is most overconfident.
 
- Figure~\ref{fig:overconf} displays the overconfidence of the models using a cubic-splines fitted between the indicator of correct classification an the confidence value in each test dataset to obtain an empirical estimates of the true rates of correct classification. We see that the models from the Pang04 and Pang05 datasets are most overconfident for points with relatively low confidence values, thus we would expect the a simple sequential search of the most-uncertain points to provide high facility locations utility in these cases. Whereas the predictions for McCauley15 and Kaggle14 are most overconfident in the highest confidence range, thus the most-uncertain search should provide low facility locations utility in these cases. 
+\section{Experimental Evaluation}
+
+We evaluate our facility location utility model by applying Algorithm 1 to four empirical data sets: pang04, pang05, mcauley15 and kaggle14. These sets originating from the \km{Pang and Lee (2004) movie review text classifier, Pang and Lee (2005) movie review text classifier, Mcauley et al. (2015) media review text classifier, and Kaggle (2014) “dogs-vs-cats” image classifier}, respectively. In each case we fit a classifier, $M(x)$, to a biased training set, then generate predicted classes and confidence values for all observations in the test set. Then singular value decomposition was used to reduce the dimensionality such that the test set, $\mathbb{X} \in \mathbb{R}^2$. The sets and classifiers were chosen to maintain consistency with the data used to evaluate methods in the previous works by Lakkaraju et al. (2017) and Bansal and Weld (2018). The pang04, pang05 and Mcauley15 sets come directly from the generously shared repository accompanying the work Bansal and Weld (2018). \km{The construction of the kaggle14 training set, test set and classifier....}
+
+Figure~\ref{fig:overconf} displays the overconfidence of the models using a cubic-splines fitted between the indicator of correct classification an the confidence value in each test dataset to obtain an empirical estimates of the true rates of correct classification. We see that the models from the Pang04 and Pang05 datasets are most overconfident for points with relatively low confidence values, thus we would expect the a simple sequential search of the most-uncertain points to provide high facility locations utility in these cases. Whereas the predictions for McCauley15 and Kaggle14 are most overconfident in the highest confidence range, thus the most-uncertain search should provide low facility locations utility in these cases. We see that these four data sets represent fairly different profiles of overconfidence, thus present good variety for evaluating characteristics of the facility locations utility model. 
 
 \begin{figure}[hbtp]
   \includegraphics[width=.45\textwidth]{../experimentsAndPlots/overconfidence.png}
@@ -142,14 +145,34 @@ The reward function is designed to impact the utility in a way that is consisten
   \label{fig:overconf}
 \end{figure}
 
+To evaluate the queries generated by the facility locations utility model we collect query results from running Algorithm~\ref{alg:Greedy} on repeated random samples from the test sets, thus allowing Monte Carlo estimates for utility characteristics. The optimization step was completed using both the logistic regression and the cluster-based construction of the probability estimates, $\phi(x)$. Figure 2 displays the Monte Carlo medians and 90\% confidence envelopes for the utility gains, paired with a visualization of confidence ranges where the model most overestimates its accuracy. To allow meaningful comparison over different test sets, that performance is scaled relative to the tractable upper bound – obtained by running the greedy algorithm with an omniscient knowledge of test misclassification. 
 
-\section{Experimental Evaluation}
+In Figure~\ref{fig:flutil}, we see that the most-uncertain selection method – that begins its search with points with confidence values just above $\tau$=.65 – provides the strongest utility for the pang04 case, as is desired, because these points are also shown to be most overconfident. The facility locations utility outcomes from using the logistic-based optimization were typically slightly lower. For the pang05 case where the overconfidence is skewed right but relatively ubiquitous, we again find very comparable utility between the logistic-based and the most-uncertain queries. For the mcauley15 where overconfidence is heavily skewed left, we now see strong facility location utility outcomes from the logistic-based optimization, and very low utility outcomes from the most-uncertain queries. \km{In the last case of kaggle14 where the overconfidence is skewed left but relatively ubiquitous, ...} . 
+
+
 
 \begin{figure}[hbtp]
   \includegraphics[width=.45\textwidth]{../experimentsAndPlots/flUtilPlaceholder.png}
   \caption{Faciltiy Locations Utility rewards finding overconfidence.}
   \label{fig:flutil}
 \end{figure}
+
+% latex table generated in R 3.4.1 by xtable 1.8-2 package
+% Fri Aug 17 14:44:32 2018
+\begin{table}[ht]
+\small
+\centering
+\begin{tabular}{llll}
+  \hline
+dataset & Most Uncertain & Coverage-Based & Facility Locations \\ 
+  \hline
+pang04 & 1.53 (1.33,1.71) & 1.47 (1.23,1.67) & 1.43 (1.14,1.69) \\ 
+  pang05 & 1.41 (1.21,1.56) & 1.66 (1.35,2.06) & 1.54 (1.16,2.08) \\ 
+  mcauley15 & 0.89 (0.71,1.08) & 1.09 (0.83,1.61) & 1.27 (0.76,8.08) \\ 
+   \hline
+\end{tabular}
+\normalsize
+\end{table}
 
 
 \begin{figure}[hbtp]
