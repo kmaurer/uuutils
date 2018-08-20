@@ -89,6 +89,9 @@ ggsave("flUtilPlaceholder.png", dpi=600,
 #  Standardized mortality ratio style comparison 
 #  number of UUs found : number UUs exected under confidence
 
+bw_results <- read.csv("bansalWeldAugust15.csv")
+mb_results <- read.csv("maurerBennetteAugust15.csv")
+
 bw_smr <- bw_results %>%
   filter(b==100) %>%
   mutate(algo = factor(phi,levels=c("cluster_prior","most_uncertain"),
