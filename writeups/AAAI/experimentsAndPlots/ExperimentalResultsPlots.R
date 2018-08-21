@@ -135,8 +135,8 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
   filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain")) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Coverage-Based","Facility Locations")),
-         dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
-                          labels=c("pang04","pang05","mcauley15")) ) 
+         dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
+                          labels=c("pang04","pang05","mcauley15","kaggle14")) ) 
 
 smr_table <- smr %>%
   mutate(value = paste0(round(smrMedian,2)," (",round(smrLower,2),",",round(smrUpper,2),")")) %>%
