@@ -44,7 +44,7 @@
 % The file aaai.sty is the style file for AAAI Press 
 % proceedings, working notes, and technical reports.
 %
-\title{Facility Location Utility for Uncovering Unknown Unknowns}
+\title{Facility Location Utility for Uncovering Classifier Overconfidence}
 \author{Karsten Maurer$^1$ \hspace{.2in} Walter Bennette$^2$\\
 $^1$Miami University Department of Statistics - maurerkt@miamioh.edu\\ 
 $^2$Air Force Research Lab Information Directorate - walter.bennette.1@us.af.mil \\
@@ -57,9 +57,7 @@ AAAI creates proceedings, working notes, and technical reports directly from ele
 
 \section{Introduction}
 
-\wdb{We are not consistent with UUs.  After the introduction of the acronym they should be UUs.  I am changing them as I find them.}
-
-\wdb{We need to change the title to something that indicates we are looking for model overconfidence}
+\wdb{We are not consistent with UUs.  After the introduction of the acronym they should be UUs.  I am changing them as I find them.} \km{I have changed all cases, with the exception of the first usage in each new section.}
 
 Techniques such as active learning \citep{Settles2010} and domain adaptation \citep{Patel2014} can be used to create machine learning classifiers when large labeled datasets are not available for a specific task.  For example, the black box classifiers made available through many online services \wdb{(Google Cloud, Amazon Web Services, etc)} require no training data and can be thought of as a kind of domain adaptation.  However, with limited amounts of labeled data, users may not be able to properly evaluate a model, and are left hoping the model will be useful for their intended task.  In this paper we build upon previous work to develop an interactive method to help evaluate classifiers in the absence of labeled data.  Specifically, we develop an interactive method to uncover unknown unknowns \citep{Attenberg2015}: instances for which a classifier is confident in its prediction, but is wrong.  
 
@@ -69,9 +67,7 @@ UUs can be thought of as blind spots to a classification model, and can be cause
 
 \citet{Attenberg2015} gamified the search for UUs and relied on human oracles to discover misclassified instances. A utility-based search algorithm for discovering UUs was then proposed by \citet{Lakkaraju2016} and expanded upon by \citet{Bansal2018}. In this paper, we propose a new utility function that shifts the emphasis from simply searching for UUs, to searching for UUs in areas of the model where errors occur more frequently than the model confidence would suggest, thus searching for classifier \textit{overconfidence}. 
 
-\wdb{I think the previous paragraph sets up nicely for a paragraph and references which motivate the need to find classifier overconfidence.}
-
-\wdb{I enjoy a paragraph at the end that tells me what is coming in the rest of the paper. If we are short on space, or you disagree, that isn't necessary.}
+\wdb{I enjoy a paragraph at the end that tells me what is coming in the rest of the paper. If we are short on space, or you disagree, that isn't necessary.} \km{Good idea, we should add this once we are certain what the rest of the paper contains}
 
 \section{Previous Works}
 
@@ -86,15 +82,15 @@ UUs can be thought of as blind spots to a classification model, and can be cause
 
 The utility in \citet{Bansal2018} has the form: $$U(Q) = \sum_{x \in \mathbb{X}} c_x \cdot \max_{q \in S} \left\{sim\left(x,q \right) \right\}$$ where $\mathbb{X} \subset \mathbb{R}^p$ is the set of available $p$-dimensional unlabeled test instances, $Q \subset \mathbb{X}$ is the set of instances labeled by an oracle, $S = \left\{x|x \in Q, y_x \neq M(x)\right\}$ is the set of discovered UUs for some classifier $M(x):\mathbb{X} \rightarrow class$, $c_x$ is the classifier's confidence in its prediction of $x$, and $sim(x,q)$ is a distance based similarity metric.  The instance $q'$ that maximizes the expected utility increase is greedily selected to be labeled by the oracle.  Meaning, $q'$ is selected to maximize, $$E\left[U_x\left(Q \cup q'\right)\right] = \hat{\phi}(x) \cdot c_x \cdot \max_{q \in S \cup q'} \left\{sim\left(x,q \right) \right\},$$ where $\hat{\phi}(x) = P\left(y_x \neq M(x) |Q \right)$ is a conditional probability that $x$ is misclassified given the query set.  As previously stated, this method is designed to incentivize a broader search for UUs and gives higher utility for finding misclassifications in higher confidence regions.  
 
-Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by sequentially querying instances for which the classifier is most uncertain. Query results were collected under the two search algorithms across 100 random samples of size n=1000 from each set of test data, with budget of B=100 quieries, because the greedy algorithms can unfold with high variability depending on the points gathered for testing. Figure~\ref{fig:coverutil} displays the Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical data sets used in \citet{Bansal2018}. We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point.  We believe this exposes a flaw in the coverage-based utility model.  We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point. This reward strategy would help find high confidence unknown unknowns if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.
+
+
+Unfortunately, the method of \citet{Bansal2018} is consistently outperformed by sequentially querying instances for which the classifier is most uncertain. Query results were collected under the two search algorithms across 100 random samples of size n=1000 from each set of test data, with budget of B=100 quieries, because the greedy algorithms can unfold with high variability depending on the points gathered for testing. Figure~\ref{fig:coverutil} displays the Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical data sets used in \citet{Bansal2018}. We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point.  We believe this exposes a flaw in the coverage-based utility model.  We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point. This reward strategy would help find high confidence UUs if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.
+
+\km{there is a lot of repetition here between then two blue paragraphs.}
 
 \wdb{Unfortunately, the coverage-based utility search of \citet{Bansal2018} consistently achieves lower utility than the simple strategy of sequentially querying instances for which the classifier is most uncertain.  This is shown in Figure~\ref{fig:coverutil} which displays Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical test datasets made available in \citet{Bansal2018}.  Here, with each test dataset, searches are performed following the two strategies for 100 random samples of size n=1000, with a budget of B=100 queries.  We believe the superior performance of the most uncertain search exposes a flaw in the coverage-based utility model.
 
-
-
-
-
-Query results were collected under the two search algorithms across 100 random samples of size n=1000 from each set of test data, with budget of B=100 quieries, because the greedy algorithms can unfold with high variability depending on the points gathered for testing. Figure~\ref{fig:coverutil} displays the Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical data sets used in \citet{Bansal2018}. We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point.  We believe this exposes a flaw in the coverage-based utility model.  We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point. This reward strategy would help find high confidence unknown unknowns if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.}
+Query results were collected under the two search algorithms across 100 random samples of size n=1000 from each set of test data, with budget of B=100 quieries, because the greedy algorithms can unfold with high variability depending on the points gathered for testing. Figure~\ref{fig:coverutil} displays the Monte Carlo medians and 90\% confidence envelopes for the coverage-based utility for the four empirical data sets used in \citet{Bansal2018}. We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point.  We believe this exposes a flaw in the coverage-based utility model.  We see that the most-uncertain algorithm is typically given higher utility early in the algorithm than the results of the greedy-adaptive algorithm using the cluster-based probabilities to optimally select the next point. This reward strategy would help find high confidence UUs if instances with similar model prediction confidence scores were near each other in the feature space, but this does not seem to be the case.}
 
 
 
@@ -173,9 +169,11 @@ To evaluate the queries generated by the facility locations utility model we col
   \label{fig:flutil}
 \end{figure*}
 
-In Figure~\ref{fig:flutil}, we see that the most-uncertain selection method – that begins its search with points with confidence values just above $\tau$=.65 – provides the strongest utility for the pang04 case, as is desired, because these points are also shown to be most overconfident. The facility locations utility outcomes from using the logistic-based optimization were typically slightly lower. For the pang05 case where the overconfidence is skewed right but relatively ubiquitous, we again find very comparable utility between the logistic-based and the most-uncertain queries. For the mcauley15 where overconfidence is heavily skewed left, we now see strong facility location utility outcomes from the logistic-based optimization, and very low utility outcomes from the most-uncertain queries. \km{In the last case of kaggle14 where the overconfidence is skewed left but relatively ubiquitous, ...} . 
+In Figure~\ref{fig:flutil}, we see that the most-uncertain selection method – that begins its search with points with confidence values just above $\tau$=.65 – provides the strongest utility for the pang04 case, as is desired, because these points are also shown to be most overconfident. The facility locations utility outcomes from using the logistic-based optimization were typically slightly lower. For the pang05 case where the overconfidence is skewed right but relatively ubiquitous, we again find very comparable utility between the logistic-based and the most-uncertain queries. For the mcauley15 where overconfidence is heavily skewed left, we now see inconsistent but strong facility location utility outcomes from the facility locations search, and consistently low utility outcomes from the most-uncertain queries. \km{In the last case of kaggle14 where the overconfidence is skewed left but relatively ubiquitous, the facility locations search provided less consistent, but typically stronger utility than most-uncertain searches}. 
 
-We also look to compare the queries gathered by the coverage-based utility algorithm and facility locations utility algorithm. Given that both rely on greedy selection relative to their own utility function, it does not make sense to compare their selections on the utility values directly. Instead we will look to using a standardized discovery ratio \km{...}
+We also look to compare the queries gathered by the coverage-based utility algorithm and facility locations utility algorithm. Given that both rely on greedy selection relative to their own utility function, it does not make sense to compare their selections on the utility values directly. Instead we compare the efficiency of the search for UUs, using a summary statistics that we call the \textit{standardized discovery ratio} (SDR). The SDR is an adaptation of the \textit{standardized mortality ratio} used in biostatistics to evaluate the mortality rate for a given sample of patients, which standardizing using their initial risk of death (\km{Bernard and Rosner, 1990; Taylor, 2013}). In our case we use an analog that evalues the misclassification rate, standardized by the initial model confidence. The SDR for a set of queried points is computed as
+$$ ||S|| / \sum_{x=1}^B(1- c_x) $$
+thus counting the number of discovered misclassifications, divided by the number of misclassifications expected given the confidence values of the points queried. The SDR can be interpreted as the number of time more misclassifications that were found than were expected based on model confidence, allowing for fair compare the efficiency of queries from any search method. \km{In Table~\ref{tab:sdr} we see... }
 
 % latex table generated in R 3.4.1 by xtable 1.8-2 package
 % Tue Aug 21 09:33:32 2018
@@ -191,6 +189,8 @@ pang04 & 1.53 (1.33,1.71) & 1.47 (1.23,1.67) & 1.43 (1.14,1.69) \\
   kaggle14 & 2.55 (2,3.02) & 3.09 (2.33,4.26) & 3.58 (2.52,4.99) \\ 
    \hline
 \end{tabular}
+  \caption{Standardized Discovery Ratio.}
+  \label{tab:sdr}
 \end{table}
 
 
