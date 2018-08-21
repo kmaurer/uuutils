@@ -100,7 +100,7 @@ ggplot()+
         legend.position = "bottom")
 
 ggsave("flUtilPlaceholder.png", dpi=600,
-       height=6,width=3.75,units="in")
+       height=5,width=7,units="in")
 
 #-------------------------------------------------------------------------------
 #  Standardized mortality ratio style comparison 
