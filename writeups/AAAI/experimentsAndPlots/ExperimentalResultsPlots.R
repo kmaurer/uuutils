@@ -55,12 +55,19 @@ str(mb_results)
 head(mb_results)
 summary(mb_results)
 
+#!# temporary kaggle addition (final version should save all experiments to single file)
 mb_kag <- read.csv("C:/Users/maurerkt/Downloads/maurerBennetteKaggle.csv")
+head(mb_kag)
+#!# fix var order
+mb_kag <- mb_kag %>%
+  select(cost:B,dataset,utilityType)
+mb_results <- rbind(mb_results,mb_kag)
+head(mb_results)
 
 
 monte_carlo_envelope <- mb_results  %>%
-  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
-                          labels=c("pang04","pang05","mcauley15")) ) %>%
+  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
+                          labels=c("pang04","pang05","mcauley15","kaggle14")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -77,12 +84,13 @@ monte_carlo_envelope <- mb_results  %>%
 ggplot()+
   geom_ribbon(aes(x=b,ymin=lower,ymax=upper,
                   group=algo, color=algo,fill=algo, 
-                  linetype=algo),size=1
+                  linetype=algo),size=1,
               alpha=.1,
               data=monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo,linetype=algo),
             data=monte_carlo_envelope,size=1)+
-  facet_grid(dataset~., scales="free_y")+
+  facet_wrap(~dataset, scales="free_y")+
+  scale_linetype_manual("Algorithm:", values=c(2,4))+
   scale_color_manual("Algorithm:", values=algo_colors[c(1,3)])+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
   theme_bw()+
