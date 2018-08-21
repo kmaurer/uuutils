@@ -1,0 +1,43 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Attenberg, Ipeirotis, and
+  Provost}{2015}]{Attenberg2015}
+Attenberg, J.; Ipeirotis, P.; and Provost, F.
+\newblock 2015.
+\newblock {Beat the Machine}.
+\newblock {\em Journal of Data and Information Quality} 6(1):1--17.
+
+\bibitem[\protect\citeauthoryear{Bansal, Weld, and Allen}{2018}]{Bansal2018}
+Bansal, G.; Weld, D.~S.; and Allen, P.~G.
+\newblock 2018.
+\newblock {A Coverage-Based Utility Model for Identifying Unknown Unknowns}.
+\newblock {\em Aaai 2018} ~8.
+
+\bibitem[\protect\citeauthoryear{Lakkaraju \bgroup et al\mbox.\egroup
+  }{2016}]{Lakkaraju2016}
+Lakkaraju, H.; Kamar, E.; Caruana, R.; and Horvitz, E.
+\newblock 2016.
+\newblock {Identifying Unknown Unknowns in the Open World: Representations and
+  Policies for Guided Exploration}.
+
+\bibitem[\protect\citeauthoryear{Nushi \bgroup et al\mbox.\egroup
+  }{2016}]{Nushi2016a}
+Nushi, B.; Kamar, E.; Horvitz, E.; and Kossmann, D.
+\newblock 2016.
+\newblock {On Human Intellect and Machine Failures: Troubleshooting Integrative
+  Machine Learning Systems}.
+
+\bibitem[\protect\citeauthoryear{Patel \bgroup et al\mbox.\egroup
+  }{2014}]{Patel2014}
+Patel, V.; Gopalan, R.; Li, R.; and Chellappa, R.
+\newblock 2014.
+\newblock {Visual Domain Adaptation: An Overview of Recent Advances}.
+\newblock  1--34.
+
+\bibitem[\protect\citeauthoryear{Settles}{2010}]{Settles2010}
+Settles, B.
+\newblock 2010.
+\newblock {Active Learning Literature Survey}.
+\newblock {\em Machine Learning} 15(2):201--221.
+
+\end{thebibliography}

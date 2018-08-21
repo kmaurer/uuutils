@@ -38,7 +38,7 @@
 \DeclareMathOperator*{\argmax}{argmax}
 
 \newcommand{\km}[1]{{\color{red} #1}} %red comments: Karsten
-\newcommand{\wb}[1]{{\color{blue} #1}} %blue comments: Walter
+\newcommand{\wdb}[1]{{\color{blue} #1}} %blue comments: Walter
 
 \begin{document}
 % The file aaai.sty is the style file for AAAI Press 
@@ -58,9 +58,9 @@ AAAI creates proceedings, working notes, and technical reports directly from ele
 \section{Introduction}
 
 
-Techniques such as active learning \citep{Settles2010} and domain adaptation \citep{Patel2014} can be used to create machine learning classifiers when large labeled datasets are not available for a specific task.  For example, the black box classifiers made available through many online services (list services) require no training data and can be thought of as a kind of domain adaptation.  However, with limited amounts of labeled data, users may not be able to properly evaluate a model, and are left hoping the model will be useful for their intended task.  In this paper we build upon previous work to develop an interactive method to help evaluate classifiers in the absence of labeled data.  Specifically, we develop an interactive method to uncover unknown unknowns \citep{Attenberg2015}: instances for which a classifier is confident in its prediction, but is wrong.  
+Techniques such as active learning \citep{Settles2010} and domain adaptation \citep{Patel2014} can be used to create machine learning classifiers when large labeled datasets are not available for a specific task.  For example, the black box classifiers made available through many online services \wdb{(list services)} require no training data and can be thought of as a kind of domain adaptation.  However, with limited amounts of labeled data, users may not be able to properly evaluate a model, and are left hoping the model will be useful for their intended task.  In this paper we build upon previous work to develop an interactive method to help evaluate classifiers in the absence of labeled data.  Specifically, we develop an interactive method to uncover unknown unknowns \citep{Attenberg2015}: instances for which a classifier is confident in its prediction, but is wrong.  
 
-Intuitive methods can be used to evaluate the performance of a model in the absence of labeled data.  Given a labeling budget one could sample instances following an experimental design, sample instances with the lowest classifier confidence, or sample instances identified as informative to the classifier through active learning strategies.  These methods could provide a sense of a model's performance but will potentially miss high confidence mistakes, referred to as \textit{unknown unknowns} (UUs).     
+Intuitive methods can be used to evaluate the performance of a model in the absence of labeled data.  For example, given a labeling budget one could sample instances following an experimental design, sample instances with the lowest classifier confidence, or sample instances identified as informative to the classifier through active learning strategies.  These methods could provide a sense of a model's performance but will potentially miss high confidence mistakes, referred to as \textit{unknown unknowns} (UUs).     
 
 Unknown unknowns can be thought of as blind spots to a classification model, and can be caused by dataset bias during training, domain shift during use, lack of model expressibility, and other causes of poor model fit.  From the viewpoint of a rational actor, unknown unknowns represent costly mistakes because minimal risk mitigation strategies will have been deployed for these high confidence predictions.  The discovery of unknown unknowns may allow new mitigation strategies to be formulated \citep{Nushi2016a}.  Additionally, as enumerated in \citep{Bansal2018}, finding unknown unknowns is valuable to understand classifier limitations and prevent attacks (stole this hard) \km{what do you mean by attacks?}
 
