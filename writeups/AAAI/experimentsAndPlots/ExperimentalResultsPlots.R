@@ -7,11 +7,17 @@ algo_colors <- brewer.pal(n = 5,name = "Set1")[c(2,1,5)]
 
 setwd("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots")
 bw_results <- read.csv("bansalWeldAugust15.csv")
+#!# temporary appending kaggle (remove after saving all experiments with 1000 iterations)
+bw_kag <- read.csv("C:/Users/maurerkt/Downloads/bansalWeldKaggle.csv")
+#!# fix var order
+bw_kag <- bw_kag %>%
+  select(cost:B,dataset,utilityType)
+bw_results <- rbind(bw_results,bw_kag)
 head(bw_results)
 
 bw_monte_carlo_envelope <- bw_results  %>%
-  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
-                          labels=c("pang04","pang05","mcauley15")) ) %>%
+  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
+                          labels=c("pang04","pang05","mcauley15","kaggle14")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -48,6 +54,9 @@ mb_results <- read.csv("maurerBennetteAugust15.csv")
 str(mb_results)
 head(mb_results)
 summary(mb_results)
+
+mb_kag <- read.csv("C:/Users/maurerkt/Downloads/maurerBennetteKaggle.csv")
+
 
 monte_carlo_envelope <- mb_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv"),
