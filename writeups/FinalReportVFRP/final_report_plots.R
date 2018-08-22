@@ -2,7 +2,33 @@ library(ggplot2)
 library(dplyr)
 library(gridExtra)
 
-setwd("~/GitHub/uuutils/writeups/FinalReportVFRP")
+setwd("C:/Users/maurerkt/Documents/GitHub/uuutils")
+
+# create cubic splines model to fit rate of correct class as function of confidence
+datasetvec <- c("pang04","pang05","mcauley15","kaggle13")
+all_overconfidence <- NULL
+for (dataset in datasetvec){
+  dat <- read.csv(paste0("./writeups/AAAI/experimentsAndPlots/inputFiles/",dataset,"_predictionResults.csv"))
+  dat <- dplyr::filter(dat, Confidence > .65, Prediction==1)
+  mod <- lm(1-dat$Misclassified ~ splines::bs(dat$Confidence, 3))
+  all_overconfidence <- rbind(all_overconfidence,
+                              data.frame(c_MX =dat$Confidence,
+                                         overconfidence = dat$Confidence - predict(mod, data.frame(c_MX=dat$Confidence)),
+                                         data_source = dataset)) 
+}
+head(all_overconfidence)
+
+ggplot()+
+  geom_line(aes(x=c_MX,y=overconfidence),
+            size=1, data=all_overconfidence)+
+  geom_hline(yintercept = 0)+
+  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
+  #           color="darkorange")+
+  facet_wrap(~data_source, scales="free_y")+
+  theme_bw()+
+  labs(x="Model Confidence", y="Overconfidence on Test Points")
+# ggsave("overconfidence.png",dpi=600,width=4,height=3.8,units="in")
+
 
 #-----------------------------------------------------
 # Demonstrate how coverage-based utility model favors most uncertain
@@ -190,24 +216,6 @@ ggsave(filename="allplotsFL.png", plot=allplots,
 
 
 #-------------------------------------------------------------
-overconf_faceted <- ggplot()+
-  geom_line(aes(x=c_MX,y=overconfidence),
-            size=1, data=all_overconfidence)+
-  geom_hline(yintercept = 0)+
-  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
-  #           color="darkorange")+
-  facet_grid(.~data_source)+
-  theme_bw()+
-  labs(x=expression("c"[Mx]), y="Overconfidence")
 
 
-ggplot()+
-  geom_line(aes(x=c_MX,y=overconfidence),
-            size=1, data=all_overconfidence)+
-  geom_hline(yintercept = 0)+
-  # geom_text(aes(x=x,y=y,label=label,hjust=hjust), data=labels_data,
-  #           color="darkorange")+
-  facet_wrap(~data_source, scales="free_y")+
-  theme_bw()+
-  labs(x="Model Confidence", y="Overconfidence on Test Points")
-# ggsave("overconfidence.png",dpi=600,width=4,height=3.8,units="in")
+
