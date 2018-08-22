@@ -6,7 +6,7 @@ library(RColorBrewer)
 algo_colors <- brewer.pal(n = 5,name = "Set1")[c(2,1,5)]
 
 setwd("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots")
-bw_results <- read.csv("bansalWeldAugust15.csv")
+bw_results <- read.csv("C:/Users/maurerkt/Downloads/bansalWeldAugust20.csv")
 #!# temporary appending kaggle (remove after saving all experiments with 1000 iterations)
 bw_kag <- read.csv("C:/Users/maurerkt/Downloads/bansalWeldKaggle.csv")
 #!# fix var order
@@ -50,7 +50,7 @@ ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
 
 #------------------------------------------------------------------------------
 
-mb_results <- read.csv("maurerBennetteAugust15.csv")
+mb_results <- read.csv("C:/Users/maurerkt/Downloads/maurerBennetteAugust20.csv")
 str(mb_results)
 head(mb_results)
 summary(mb_results)
