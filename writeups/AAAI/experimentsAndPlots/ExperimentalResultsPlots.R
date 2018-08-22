@@ -10,7 +10,7 @@ setwd("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPl
 
 #---------------------------------------------------------------------------------------
 # Figure 1: comparing MU and BW on coverage-based utility
-bw_results <- read.csv("C:/Users/maurerkt/Downloads/outputFiles/bansalWeld.csv")
+bw_results <- read.csv("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/outputFiles/bansalWeld.csv")
 head(bw_results)
 unique(bw_results$dataset)
 
@@ -49,14 +49,12 @@ ggplot()+
 
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
-library(ggplot2)
-library(dplyr)
 
 # create cubic splines model to fit rate of correct class as function of confidence
 datasetvec <- c("pang04","pang05","mcauley15","kaggle13")
 all_overconfidence <- NULL
 for (dataset in datasetvec){
-  dat <- read.csv(paste0("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots/inputFiles/",dataset,"_predictionResults.csv"))
+  dat <- read.csv(paste0("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/inputFiles/",dataset,"_predictionResults.csv"))
   dat <- dplyr::filter(dat, Confidence > .65, Prediction==1)
   mod <- lm(1-dat$Misclassified ~ splines::bs(dat$Confidence, 3))
   all_overconfidence <- rbind(all_overconfidence,
@@ -81,24 +79,10 @@ ggplot()+
 #---------------------------------------------------------------------------------------
 # Figure 3: comparing MU and FL searches on FL utility
 
-mb_results <- read.csv("C:/Users/maurerkt/Downloads/maurerBennetteAugust20.csv")
-str(mb_results)
+mb_results <- read.csv("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/outputFiles/maurerBennette.csv")
 head(mb_results)
-summary(mb_results)
-
-#!# temporary kaggle addition (final version should save all experiments to single file)
-mb_kag <- read.csv("C:/Users/maurerkt/Downloads/maurerBennetteKaggle.csv")
-head(mb_kag)
-#!# fix var order
-mb_kag <- mb_kag %>%
-  select(cost:B,dataset,utilityType)
-mb_results <- rbind(mb_results,mb_kag)
-head(mb_results)
-
-# mb_results <- read.csv("C:/Users/maurerkt/Downloads/outputFiles/maurerBennette.csv")
-# head(mb_results)
-# unique(mb_results$dataset)
-# unique(mb_results$phi)
+unique(mb_results$dataset)
+unique(mb_results$phi)
 
 monte_carlo_envelope <- mb_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
