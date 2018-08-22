@@ -1,0 +1,87 @@
+@article{Settles2010,
+abstract = {The key idea behind active learning is that a machine learning algorithm can achieve greater accuracy with fewer training labels if it is allowed to choose the data from which it learns. An active learner may pose queries, usually in the form of unlabeled data instances to be labeled by an oracle (e.g., a human annotator). Active learning is well-motivated in many modern machine learning problems, where unlabeled data may be abundant or easily obtained, but labels are difficult, time-consuming, or expensive to obtain. This report provides a general introduction to active learning and a survey of the literature. This includes a discussion of the scenarios in which queries can be formulated, and an overview of the query strategy frameworks proposed in the literature to date. An analysis of the empirical and theoretical evidence for successful active learning, a summary of problem setting variants and practical issues, and a discussion of related topics in machine learning research are also presented.},
+annote = {We may be looking at membership query synthesis},
+archivePrefix = {arXiv},
+arxivId = {1206.5533},
+author = {Settles, Burr},
+doi = {10.1.1.167.4245},
+eprint = {1206.5533},
+file = {:Users/Walter/Documents/Literature/Active{\_}learning{\_}literature{\_}survey.pdf:pdf},
+isbn = {978-1-4673-8391-2},
+issn = {00483931},
+journal = {Machine Learning},
+number = {2},
+pages = {201--221},
+pmid = {15003161},
+title = {{Active Learning Literature Survey}},
+volume = {15},
+year = {2010}
+}
+
+@article{Patel2014,
+author = {Patel, Vm and Gopalan, Raghuraman and Li, Ruonan and Chellappa, R},
+doi = {10.1109/MSP.2014.2347059},
+file = {:Users/Walter/Library/Application Support/Mendeley Desktop/Downloaded/Patel et al. - 2014 - Visual Domain Adaptation An Overview of Recent Advances.pdf:pdf},
+issn = {10535888},
+pages = {1--34},
+title = {{Visual Domain Adaptation: An Overview of Recent Advances}},
+url = {http://www.umiacs.umd.edu/users/pvishalm/Journal{\_}pub/SPM{\_}DA{\_}v7{\_}embeded.pdf},
+year = {2014}
+}
+
+@article{Attenberg2015,
+author = {Attenberg, Joshua and Ipeirotis, Panos and Provost, Foster},
+doi = {10.1145/2700832},
+file = {:Users/Walter/Library/Application Support/Mendeley Desktop/Downloaded/Attenberg, Ipeirotis, Provost - 2015 - Beat the Machine.pdf:pdf},
+issn = {19361955},
+journal = {Journal of Data and Information Quality},
+number = {1},
+pages = {1--17},
+title = {{Beat the Machine}},
+url = {http://dl.acm.org/citation.cfm?doid=2742852.2700832},
+volume = {6},
+year = {2015}
+}
+
+@article{Nushi2016a,
+abstract = {We study the problem of troubleshooting machine learning systems that rely on analytical pipelines of distinct components. Understanding and fixing errors that arise in such integrative systems is difficult as failures can occur at multiple points in the execution workflow. Moreover, errors can propagate, become amplified or be suppressed, making blame assignment difficult. We propose a human-in-the-loop methodology which leverages human intellect for troubleshooting system failures. The approach simulates potential component fixes through human computation tasks and measures the expected improvements in the holistic behavior of the system. The method provides guidance to designers about how they can best improve the system. We demonstrate the effectiveness of the approach on an automated image captioning system that has been pressed into real-world use.},
+archivePrefix = {arXiv},
+arxivId = {1611.08309},
+author = {Nushi, Besmira and Kamar, Ece and Horvitz, Eric and Kossmann, Donald},
+eprint = {1611.08309},
+file = {:Users/Walter/Documents/Literature/1611.08309.pdf:pdf},
+title = {{On Human Intellect and Machine Failures: Troubleshooting Integrative Machine Learning Systems}},
+url = {http://arxiv.org/abs/1611.08309},
+year = {2016}
+}
+
+@article{Bansal2018,
+abstract = {A classifier's low confidence in prediction is often indica-tive of whether its prediction will be wrong; in this case, in-puts are called known unknowns. In contrast, unknown un-knowns (UUs) are inputs on which a classifier makes a high confidence mistake. Identifying UUs is especially impor-tant in safety-critical domains like medicine (diagnosis) and law (recidivism prediction). Previous work by Lakkaraju et al. (2017) on identifying unknown unknowns assumes that the utility of each revealed UU is independent of the oth-ers, rather than considering the set holistically. While this assumption yields an efficient discovery algorithm, we ar-gue that it produces an incomplete understanding of the clas-sifier's limitations. In response, this paper proposes a new class of utility models that rewards how well the discovered UUs cover (or " explain ") a sample distribution of expected queries. Although choosing an optimal cover is intractable, even if the UUs were known, our utility model is monotone submodular, affording a greedy discovery strategy. Exper-imental results on four datasets show that our method out-performs bandit-based approaches and achieves within 60.9{\%} utility of an omniscient, tractable upper bound.},
+author = {Bansal, Gagan and Weld, Daniel S and Allen, Paul G},
+file = {:Users/Walter/Documents/Literature/bansal-aaai18.pdf:pdf},
+journal = {Aaai 2018},
+pages = {8},
+title = {{A Coverage-Based Utility Model for Identifying Unknown Unknowns}},
+url = {http://aiweb.cs.washington.edu/ai/pubs/bansal-aaai18.pdf},
+year = {2018}
+}
+
+@article{Lakkaraju2016,
+abstract = {Predictive models deployed in the real world may assign incorrect labels to instances with high confidence. Such errors or unknown unknowns are rooted in model incompleteness, and typically arise because of the mismatch between training data and the cases encountered at test time. As the models are blind to such errors, input from an oracle is needed to identify these failures. In this paper, we formulate and address the problem of informed discovery of unknown unknowns of any given predictive model where unknown unknowns occur due to systematic biases in the training data. We propose a model-agnostic methodology which uses feedback from an oracle to both identify unknown unknowns and to intelligently guide the discovery. We employ a two-phase approach which first organizes the data into multiple partitions based on the feature similarity of instances and the confidence scores assigned by the predictive model, and then utilizes an explore-exploit strategy for discovering unknown unknowns across these partitions. We demonstrate the efficacy of our framework by varying the underlying causes of unknown unknowns across various applications. To the best of our knowledge, this paper presents the first algorithmic approach to the problem of discovering unknown unknowns of predictive models.},
+annote = {Looking to discover failure states of predictive models.},
+archivePrefix = {arXiv},
+arxivId = {1610.09064},
+author = {Lakkaraju, Himabindu and Kamar, Ece and Caruana, Rich and Horvitz, Eric},
+eprint = {1610.09064},
+file = {:Users/Walter/Documents/Literature/unknown{\_}unknowns{\_}identify{\_}algo.pdf:pdf},
+title = {{Identifying Unknown Unknowns in the Open World: Representations and Policies for Guided Exploration}},
+url = {http://arxiv.org/abs/1610.09064},
+year = {2016}
+}
+
+
+
+
+
+
+
