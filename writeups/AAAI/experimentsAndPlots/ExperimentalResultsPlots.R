@@ -123,8 +123,8 @@ ggplot()+
 # Figure 4: Standardized mortality ratio style comparison 
 #  number of UUs found : number UUs exected under confidence
 
-bw_results <- read.csv("bansalWeldAugust15.csv")
-mb_results <- read.csv("maurerBennetteAugust15.csv")
+# bw_results <- read.csv("bansalWeldAugust15.csv")
+# mb_results <- read.csv("maurerBennetteAugust15.csv")
 
 bw_smr <- bw_results %>%
   filter(b==100) %>%
@@ -152,8 +152,13 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
   filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain")) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Coverage-Based","Facility Locations")),
-         dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("pang04","pang05","mcauley15","kaggle14")) ) 
+         dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
+                          labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
+  arrange(dataset, algo)
+
+smr %>% 
+  group_by(dataset) %>%
+  mutate(vs_fl = smrMedian[algo=="Facility Locations"]/smrMedian)
 
 # smr_table <- smr %>%
 #   mutate(value = paste0(round(smrMedian,2)," (",round(smrLower,2),",",round(smrUpper,2),")")) %>%
@@ -168,22 +173,23 @@ ggplot() +
   geom_errorbar(aes(ymin=smrLower,ymax=smrUpper,
                     color=algo, x=dataset),width=.5,
                 position = "dodge", data=smr, size=1) +
-  geom_point(aes(y=smrMedian, color=algo, x=dataset),
-                position=position_dodge(width=.5), 
-             shape=18, data=smr, size=3) +
+  geom_point(aes(y=smrMedian, color=algo, x=dataset, shape=algo),
+                position=position_dodge(width=.5), data=smr, size=3) +
   scale_color_manual("Algorithm:", values=algo_colors) +
+  scale_shape_manual("Algorithm:", values=13:15) +
   geom_hline(yintercept = 1) +
   scale_y_continuous(breaks=seq(0,10,2), 
                      limits=c(0,max(smr$smrUpper))) +
   labs(y="Misclassification Discovery Ratio \n Found : Expected",
        x="") +
   theme_bw() +
-  theme(legend.position = c(.65,.35),
-        axis.text.y= element_text(angle=90, hjust=.5))+
+  theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
+        axis.text.y= element_text(angle=90, hjust=.5),
+        legend.background =  element_rect(color="black"))+
   coord_flip() + guides(colour = guide_legend(reverse=T))
 
 # ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=3.4,width=4.5,units="in")
+#        height=3.5,width=3.5,units="in")
 
 
 
@@ -225,8 +231,8 @@ ggplot() +
 
 
 components <- mb_results  %>%
-  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("pang04","pang05","mcauley15","kaggle13")) ,
+  mutate(dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
+                          labels=c("kaggle13","mcauley15","pang05","pang04")) ,
          utility = reward - 100*sum_min_dist) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
