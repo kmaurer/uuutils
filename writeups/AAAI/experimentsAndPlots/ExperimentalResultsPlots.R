@@ -223,4 +223,46 @@ ggplot() +
 #                   select(mb_conf, algo,conf,dataset,iteration) )
 # 
 
+
+components <- mb_results  %>%
+  mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
+                          labels=c("pang04","pang05","mcauley15","kaggle13")) ,
+         utility = reward - 100*sum_min_dist) %>%
+  group_by(phi, b, dataset) %>%
+  summarize(lower=quantile(utility,.05),
+            upper=quantile(utility,.95),
+            q3=quantile(utility,.75),
+            q1=quantile(utility,.25),
+            median = median(utility, na.rm=T))%>%
+  ungroup() %>%
+  mutate(algo=factor(phi,levels=c("cluster_prior","logistic","most_uncertain"),
+                     labels=c("Cluster FL","Facility Locations","Most Uncertain")),
+         algo=as.character(algo)) %>%
+  filter(algo != "Cluster FL") %>%
+  mutate(algo = factor(algo, levels=c("Most Uncertain","Facility Locations")))
+
+
+ggplot()+
+  geom_ribbon(aes(x=b,ymin=lower,ymax=upper,
+                  group=algo, color=algo,fill=algo),
+              linetype=2, alpha=.1,
+              data=components)+
+  geom_line(aes(x=b,y=median, color=algo),linetype=1,size=1,
+            data=components)+
+  facet_wrap(~dataset, scales="free_y")+
+  scale_color_manual("Algorithm:", values=algo_colors[c(1,3)])+
+  scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
+  theme_bw()+
+  labs(x="Query Step (b)",
+       y="Coverage-Based Utility")+
+  theme(axis.title = element_text(size=15),
+        legend.position = "bottom")+
+  scale_x_continuous(limits=c(1,100))
+
+ggplot() +
+  geom_line()
+
+
+
+
   
