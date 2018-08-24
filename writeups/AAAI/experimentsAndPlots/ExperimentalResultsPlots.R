@@ -176,7 +176,8 @@ ggplot() +
   geom_point(aes(y=smrMedian, color=algo, x=dataset, shape=algo),
                 position=position_dodge(width=.5), data=smr, size=3) +
   scale_color_manual("Algorithm:", values=algo_colors) +
-  scale_shape_manual("Algorithm:", values=13:15) +
+  scale_shape_manual("Algorithm:", values=15:17) +
+  # scale_linetype_manual("Algorithm:", values=1:3) +
   geom_hline(yintercept = 1) +
   scale_y_continuous(breaks=seq(0,10,2), 
                      limits=c(0,max(smr$smrUpper))) +
@@ -186,10 +187,12 @@ ggplot() +
   theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
         axis.text.y= element_text(angle=90, hjust=.5),
         legend.background =  element_rect(color="black"))+
-  coord_flip() + guides(colour = guide_legend(reverse=T))
+  coord_flip() + guides(colour = guide_legend(reverse=T),
+                        shape = guide_legend(reverse=T),
+                        linetype = guide_legend(reverse=T))
 
-# ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=3.5,width=3.5,units="in")
+ggsave("discoveryRatioPlaceholder.png", dpi=600,
+       height=3.5,width=3.5,units="in")
 
 
 
