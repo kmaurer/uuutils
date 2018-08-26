@@ -181,7 +181,7 @@ ggplot() +
   geom_hline(yintercept = 1) +
   scale_y_continuous(breaks=seq(0,10,2), 
                      limits=c(0,max(smr$smrUpper))) +
-  labs(y="Misclassification Discovery Ratio \n Found : Expected",
+  labs(y="Misclassification Discovery Ratio",
        x="") +
   theme_bw() +
   theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
@@ -191,8 +191,8 @@ ggplot() +
                         shape = guide_legend(reverse=T),
                         linetype = guide_legend(reverse=T))
 
-ggsave("discoveryRatioPlaceholder.png", dpi=600,
-       height=3.5,width=3.5,units="in")
+# ggsave("discoveryRatioPlaceholder.png", dpi=600,
+#        height=3.5,width=3.5,units="in")
 
 
 
