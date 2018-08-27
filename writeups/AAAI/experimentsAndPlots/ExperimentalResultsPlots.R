@@ -112,7 +112,7 @@ ggplot()+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
   theme_bw()+
   labs(x="Query Step (b)",
-       y="Coverage-Based Utility")+
+       y="Facility Locations Utility")+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
