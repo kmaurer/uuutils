@@ -55,23 +55,17 @@ url = {http://arxiv.org/abs/1611.08309},
 year = {2016}
 }
 
-@article{Bansal2018,
-abstract = {A classifier's low confidence in prediction is often indica-tive of whether its prediction will be wrong; in this case, in-puts are called known unknowns. In contrast, unknown un-knowns (UUs) are inputs on which a classifier makes a high confidence mistake. Identifying UUs is especially impor-tant in safety-critical domains like medicine (diagnosis) and law (recidivism prediction). Previous work by Lakkaraju et al. (2017) on identifying unknown unknowns assumes that the utility of each revealed UU is independent of the oth-ers, rather than considering the set holistically. While this assumption yields an efficient discovery algorithm, we ar-gue that it produces an incomplete understanding of the clas-sifier's limitations. In response, this paper proposes a new class of utility models that rewards how well the discovered UUs cover (or " explain ") a sample distribution of expected queries. Although choosing an optimal cover is intractable, even if the UUs were known, our utility model is monotone submodular, affording a greedy discovery strategy. Exper-imental results on four datasets show that our method out-performs bandit-based approaches and achieves within 60.9{\%} utility of an omniscient, tractable upper bound.},
-author = {Bansal, Gagan and Weld, Daniel S and Allen, Paul G},
-file = {:Users/Walter/Documents/Literature/bansal-aaai18.pdf:pdf},
-journal = {Aaai 2018},
-pages = {8},
-title = {{A Coverage-Based Utility Model for Identifying Unknown Unknowns}},
-url = {http://aiweb.cs.washington.edu/ai/pubs/bansal-aaai18.pdf},
-year = {2018}
+@inproceedings{Bansal2018,
+  title={A Coverage-Based Utility Model for Identifying Unknown Unknowns},
+  author={Bansal, Gagan and Weld, Daniel S},
+  booktitle={AAAI},
+  year={2018}
 }
 
 @inproceedings{Lakkaraju2016,
   title={Identifying Unknown Unknowns in the Open World: Representations and Policies for Guided Exploration.},
   author={Lakkaraju, Himabindu and Kamar, Ece and Caruana, Rich and Horvitz, Eric},
   booktitle={AAAI},
-  volume={1},
-  pages={2},
   year={2017}
 }
 
@@ -127,5 +121,32 @@ year = {2018}
   pages={544--562},
   year={2004},
   publisher={SIAM}
+}
+
+@inproceedings{pang2005,
+  title={Seeing stars: Exploiting class relationships for sentiment categorization with respect to rating scales},
+  author={Pang, Bo and Lee, Lillian},
+  booktitle={Proceedings of the 43rd annual meeting on association for computational linguistics},
+  pages={115--124},
+  year={2005},
+  organization={Association for Computational Linguistics}
+}
+
+@inproceedings{pang2004,
+  title={A sentimental education: Sentiment analysis using subjectivity summarization based on minimum cuts},
+  author={Pang, Bo and Lee, Lillian},
+  booktitle={Proceedings of the 42nd annual meeting on Association for Computational Linguistics},
+  pages={271},
+  year={2004},
+  organization={Association for Computational Linguistics}
+}
+
+@inproceedings{mcauley2015,
+  title={Inferring networks of substitutable and complementary products},
+  author={McAuley, Julian and Pandey, Rahul and Leskovec, Jure},
+  booktitle={Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  pages={785--794},
+  year={2015},
+  organization={ACM}
 }
 
