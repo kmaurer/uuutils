@@ -217,27 +217,23 @@ Figure~\ref{fig:sdr} compares the Monte Carlo medians and 90\%  central interval
   \label{fig:sdr}
 \end{figure}
 
-
-
 \section{Discussion \& Conclusions}
 
-Previous literature has defined unknown unknowns as any highly confident predictions that results in misclassification, but this definition ignores the unavoidable uncertainties of predictive modeling. It should be expected that classifier predictions are imperfect, this is why confidence statements exist! The actions we take as a result of the predictions should take into account the inherent uncertainty. However, in the case where the claimed confidence is overstated, we cannot properly mitigate the risk posed by misclassification. Unlike the previous works that propose utility functions that simply seek to uncover high confidence misclassifications, the facility locations utility that we propose is designed to seek out overconfident misclassifications. We have demonstrated the ability of our greedy algorithm to consistently obtain strong facility locations utility in four data scenarios with disparate overconfidence profiles. 
+Previous literature has defined unknown unknowns as any highly confident predictions that results in misclassification, possibly with respect to a critical class. This definition ignores the unavoidable uncertainties of predictive modeling. It should be expected that classifier predictions are imperfect, this is why confidence values exist! The actions taken as a result of the predictions should take into account the inherent uncertainty. However, in the case where the claimed confidence is overstated, a rational actor cannot properly mitigate the risk posed by misclassification. Unlike the previous works that propose utility functions that seek to uncover high confidence misclassifications, the facility locations utility that we propose is designed to seek out \textit{overconfident} misclassifications. 
 
-The use of the logistic regression probability estimates for $\hat{\phi}(x)$ in the optimization step appears to be robust to the underlying structure overconfidence, providing a strong misclassification discovery ratio in the tested cases. This is important because in real-world applications we wouldn’t know the overconfidence behavior a priori to our query search, so we require a versatile estimation method. 
+Through repeated random initialization in our compuational experiments, we thoroughly tested the outcomes of our facility locations utility algorithm against the coverage-based and most uncertain search algorithms. We have demonstrated the ability of our greedy algorithm, using logistic regression probability estimates for $\hat{\phi}(x)$ in the optimization step, to consistently obtain strong facility locations utility in four data scenarios with disparate overconfidence profiles. This is important because in real-world applications we wouldn’t know the overconfidence behavior a priori to our query search, so we require a versatile estimation method. We have also demonstrated that oracle queries gathered using a facility locations utility search tend to have higher standardized discovery ratios than the alternative algorithms, thus represent a more efficient use of the constrained budget for queries. 
 
-There are many avenues for future work related to the facility locations utility methods that we have presented. First, the facility locations utility model structure separates the discovery reward and coverage proximity components, which could allow separate rescaling to weight each component in line with the priorities of an application. Next, exploratory methods could be developed to evaluate what the query set tells us about the overconfidence of your model, perhaps interpreting the structure of the models used to predict $\hat{\phi}(x)$ to better understand what features are related to overconfidence. Lastly, there may be cases where it is impractical to collect a large enough oracle query set to refit the original classifier, but it may be sufficient to estimate the original classifier’s overconfidence and perform recalibration so that actions taken based on the predictions can include more appropriate risk mitigation. 
+The source code and data sets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \texttt{uuutils} R package can be accessed through the github repository at \url{www.github.com/kmaurer/uuutils}.
+
+There are many avenues for future work related to the facility locations utility methods that we have presented. First, the facility locations utility model structure separates the discovery reward and coverage proximity components, which could allow separate rescaling to weight each component in line with the priorities of an application, or use of non-Euclidean distances. Next, exploratory methods could be developed to evaluate what the query set tells us about the overconfidence of your model, perhaps interpreting the structure of the models used to predict $\hat{\phi}(x)$ to better understand what features are related to overconfidence. Lastly, there may be cases where it is impractical to collect a large enough oracle query set to refit the original classifier, but it may be sufficient to estimate the original classifier’s overconfidence and perform recalibration so that actions taken based on the predictions can include more appropriate risk mitigation. 
 
 \section{Acknowledgements} 
 
 Support for this research was provided by the Visiting Summer Faculty Program and Extension Grants sponsored by the Griffiss Institute, in collaboration with the Air Force Research Lab. 
 
-We would like to thank Dr. Eric Heim, Dylon \km{???}, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
+We would like to thank Dr. Eric Heim, Dylan Elliott, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
 
 \km{Put "cleared for public release statement" here}
-
-
-\wdb{1. We say we run both logistic and clustering, but don't show results for both. We should clarify that. 2. We should bring up the critical class somewhere. 3. We should say we make ours available, but be careful of double blind. 5. We don't say how we prime the logistic regression 12. Eric seemed skeptical about Euclidean distance, but liked their distance. Do we want to do the same to avoid questions?}
-
 
 \newpage
 \bibliographystyle{aaai}
