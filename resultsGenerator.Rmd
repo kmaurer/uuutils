@@ -1,0 +1,301 @@
+---
+title: "Definitive results generator"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+source("experimentRunner.R")
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+
+## Search parameters
+
+```{r}
+sampsize = 1000
+Iterations = 1000
+B = 100
+datasets <- c('pang04Out.csv', 'pang05Out.csv', 'mcauley15Out.csv', 'kaggle13Out.csv')
+path <- '/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/inputFiles/'
+```
+
+
+## Bansal and Weld
+
+```{r}
+##
+## Search parameters
+##
+conf_cost <- function(c_MX,...) I(c_MX)                                    ## Cost as defined in Bansal and Weld
+cost_fctn_vec <- c("conf_cost")       
+phi_mod_types <- c("cluster_prior", "most_uncertain")                      ## Run for cluster_prior phi estimation, and most_uncertain
+                                      
+
+three <- NULL
+for(set in datasets){
+  ##
+  ## Read data made by python and prepare data for search
+  ##          Look only at critical class
+  ##          Look only when confidence is > 0.65
+  ##
+  dat <- readr::read_csv(paste0(path, set)) %>%  
+         filter(Prediction == 1) %>% filter(Confidence > 0.65)
+  ##
+  ## Search
+  ##
+  for(i in 1:Iterations){ 
+    samples <- sample(1:nrow(dat),sampsize)
+    
+    D_test <- as.matrix(dat[,c('X1','X2')])[samples,]
+    if(set == "kaggle13Out.csv"){
+      D_test <- as.matrix(dat[,c('X1','X2', 'X3', 'X4', 'X5')])[samples,]  
+    }
+    
+    one <- bansalWeldLargeBudget(phi_mod_types = phi_mod_types,
+                                 cost_fctn_vec = cost_fctn_vec,
+                                 D_test = as.matrix(dat[,c('X1','X2')])[samples,],
+                                 c_MX = as.numeric(dat$Confidence)[samples], 
+                                 true_misclass = as.numeric(dat$Misclassified)[samples],
+                                 Q_prime_idx = NULL,
+                                 prior = 1-as.numeric(dat$Confidence),
+                                 tau = .65,
+                                 sigma=.001,
+                                 clust_max = 5,
+                                 scale = TRUE,
+                                 B = B)
+  
+    two <- data.frame(one, iteration = i, B = B, dataset = set)
+    
+    three <- rbind(three, two)
+
+    if(((i-1) %% 100) == 0){
+      print(paste("Done with iteration",i))
+    }
+    rm(one)
+    rm(two)
+    rm(samples)
+  } 
+  
+}
+bansalWeld <- three
+rm(three)
+bansalWeld$utilityType <- "BansalWeld"
+
+
+```
+
+
+## Maurer Bennette
+
+```{r}
+phi_mod_types <- c("cluster_prior", "most_uncertain", "logistic")
+
+three <- NULL
+for(set in datasets){
+  ##
+  ## Read data made by python and prepare data for search
+  ##
+  dat <- readr::read_csv(paste0(path, set)) %>%  
+         filter(Prediction == 1) %>% filter(Confidence > 0.65) 
+  D_test <- as.matrix(dat[,c('X1','X2')])
+    if(set == "kaggle13Out.csv"){
+      D_test <- as.matrix(dat[,c('X1','X2', 'X3', 'X4', 'X5')])
+    }
+  c_MX <- as.vector(dat$Confidence)
+  c_MX[c_MX == 1] <- .9999999
+  true_misclass <- as.numeric(dat$Misclassified)
+  
+  ##
+  ## Search
+  ##
+  clust_out <- UUclust(D_test, c_MX, clust_max=5, clust_set=NULL)
+  for(i in 1:Iterations){ 
+  
+    samples <- sample(1:nrow(dat),sampsize)
+    
+    
+    res_list <- lapply(phi_mod_types, function(phi){
+      maurerBennetteGreedyBudget(D_test[samples,],
+                                    c_MX[samples],
+                                    true_misclass[samples],
+                                    B = B,
+                                    tau=.65,
+                                    prior=rep(.5, length(D_test)), 
+                                    phi_mod_type=phi,
+                                    clust_out, 
+                                    updateprior=FALSE,
+                                    alpha=0.5)
+    })
+    one <- do.call(rbind,res_list)
+    
+
+  
+    two <- data.frame(one, iteration = i, B = B, dataset = set)
+    
+    
+  
+  
+
+    three <- rbind(three, two)
+
+    if(((i-1) %% 100) == 0){
+      print(paste("Done with iteration",i))
+    }
+ 
+    rm(one)
+    rm(two)
+    rm(samples)
+  } 
+  
+}
+maurerBennette <- three
+rm(three)
+maurerBennette$utilityType <- "MaurerBennette"
+
+```
+
+
+
+## Lakkaraju
+
+```{r}
+##
+## Search parameters
+##
+
+three <- NULL
+for(set in datasets){
+  ##
+  ## Read data made by python and prepare data for search
+  ##
+  dat <- readr::read_csv(paste0(path, set)) %>%  
+         filter(Prediction == 1) %>% 
+         filter(Confidence > 0.65)
+  dat$Confidence[which(dat$Confidence == 1)] <- 0.9999999
+  ##
+  ## Search
+  ##
+  for(i in 1:Iterations){ 
+  
+    samples <- sample(1:nrow(dat),sampsize)
+    
+    D_test <- as.matrix(dat[,c('X1','X2')])[samples,]
+    if(set == "kaggle13Out.csv"){
+      D_test <- as.matrix(dat[,c('X1','X2', 'X3', 'X4', 'X5')])[samples,]  
+    }
+    
+    
+    one <- bandit_search(D_test = D_test,
+                         c_MX = as.numeric(dat$Confidence)[samples],
+                         true_misclass = as.numeric(dat$Misclassified)[samples], 
+                         B,tau=.65, clust_max=5, clust_set=NULL, sigma=.001, scale=TRUE)
+  
+    two <- data.frame(one, iteration = i, B = B, dataset = set)
+    
+    three <- rbind(three, two)
+
+    if(((i-1) %% 10) == 0){
+      print(paste("Done with iteration",i))
+    }
+ 
+    rm(one)
+    rm(two)
+    rm(samples)
+  } 
+  
+}
+bandits <- three
+rm(three)
+bandits$utilityType <- "Bandits"
+
+#readr::write_csv(bandits, "/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/outputFiles/Lakkaraju.csv")
+```
+
+
+## Put together
+
+```{r}
+
+final <- rbind(bandits, bansalWeld, maurerBennette %>% select(-reward, -sum_min_dist))
+
+```
+
+
+## Plot
+
+```{r}
+spot = 100
+
+bw_smr <- bansalWeld %>%
+          filter(b==spot) %>%
+          mutate(algo = factor(phi, levels=c("cluster_prior","most_uncertain"), labels=c("Coverage-Based","Most Uncertain")),
+                 smr = found/(B-cumulativeConfidence)) %>%
+          group_by(dataset, algo) %>%
+          summarize(smrLower = quantile(smr,.05),
+                    smrMedian = quantile(smr,.5),
+                    smrUpper = quantile(smr,.95))
+
+mb_smr <- maurerBennette %>%
+          filter(b==spot) %>%
+          mutate(algo = factor(phi, levels=c("cluster_prior","logistic","most_uncertain"), labels=c("Cluster FL","Facility Locations","Most Uncertain")),
+                 smr = found/(B-cumulativeConfidence)) %>%
+          group_by(dataset, algo) %>%
+          summarize(smrLower = quantile(smr,.05),
+                    smrMedian = quantile(smr,.5),
+                    smrUpper = quantile(smr,.95)) 
+
+bandits_smr <- bandits %>%
+               filter(b==spot) %>%
+               mutate(algo = factor(phi,levels=c("Bandits"), labels=c("Bandits")),
+                      smr = found/(B-cumulativeConfidence)) %>%
+               group_by(dataset, algo) %>%
+               summarize(smrLower = quantile(smr,.05),
+                         smrMedian = quantile(smr,.5),
+                         smrUpper = quantile(smr,.95)) 
+
+
+smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"), bandits_smr) %>%
+       filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain", "Bandits", "Cluster FL")) %>%
+       ungroup() %>%
+       mutate(dataset = factor(dataset, levels=c("kaggle13Out.csv","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"), labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
+       arrange(dataset, algo)
+
+smr %>% 
+  group_by(dataset) %>%
+  mutate(vs_fl = smrMedian[algo=="Facility Locations"]/smrMedian)
+
+
+ggplot() +
+  geom_errorbar(aes(ymin=smrLower,ymax=smrUpper,
+                    color=algo, x=dataset),width=.5,
+                position = "dodge", data=smr, size=1) +
+  geom_point(aes(y=smrMedian, color=algo, x=dataset, shape=algo),
+             position=position_dodge(width=.5), data=smr, size=3) +
+  geom_hline(yintercept = 1) +
+  scale_y_continuous(breaks=seq(0,10,2), 
+                     limits=c(0,max(smr$smrUpper))) +
+  labs(y="Misclassification Discovery Ratio",
+       x="") +
+  theme_bw() +
+  theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
+        axis.text.y= element_text(angle=90, hjust=.5),
+        legend.background =  element_rect(color="black"))+
+  coord_flip() + guides(colour = guide_legend(reverse=T),
+                        shape = guide_legend(reverse=T),
+                        linetype = guide_legend(reverse=T))
+
+
+```
+
+
+
+
+
+
+
+
