@@ -16,7 +16,7 @@ unique(bw_results$dataset)
 
 bw_monte_carlo_envelope <- bw_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("pang04","pang05","mcauley15","kaggle13")) ) %>%
+                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -64,6 +64,8 @@ for (dataset in datasetvec){
 }
 head(all_overconfidence)
 
+all_overconfidence$data_source <- factor(all_overconfidence$data_source,labels=c("Pang04","Pang05","Mcauley15","Kaggle13"))
+
 ggplot()+
   geom_line(aes(x=c_MX,y=overconfidence),
             size=1, data=all_overconfidence)+
@@ -86,7 +88,7 @@ unique(mb_results$phi)
 
 monte_carlo_envelope <- mb_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("pang04","pang05","mcauley15","kaggle13")) ) %>%
+                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -166,7 +168,7 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"),lak_smr) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Bandit","Coverage-Based","Facility Locations")),
          dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
-                          labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
+                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
   arrange(dataset, algo)
 
 smr %>% 
@@ -205,7 +207,7 @@ ggplot() +
                         linetype = guide_legend(reverse=T))
 
 # ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=4.5,width=4,units="in")
+#        height=4,width=4,units="in")
 
 
 
