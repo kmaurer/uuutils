@@ -7,9 +7,7 @@ source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/facility_lo
 bandit_search <- function(D_test, c_MX, true_misclass, B, tau=.65, clust_max=5, clust_set=NULL, sigma=.001, scale=TRUE){
   
   conf_cost <- function(c_MX,...) I(c_MX)
-#  conf_cost <- function(c_MX, ...){
- #   log(1/(1-c_MX))
-#  }
+
   clust_out <- UUclust(D_test, c_MX, clust_max, clust_set)      ## Create clusters+
   k <- length((unique(clust_out)))
   
@@ -130,7 +128,7 @@ bandit_search <- function(D_test, c_MX, true_misclass, B, tau=.65, clust_max=5, 
       # find optimal new q observations
       Sc_idx <- arms[[curr_arm]] 
       P_expx_Q <- P_explainx_Q(sim_mat, solution, true_misclass, c_MX, tau)
-      q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, rep(1, length(P_expx_Q)), sim_mat, c_MX, P_expx_Q, "conf_cost"))]
+      q_new_idx <- Sc_idx[which.max(exp_utility_step_all(Sc_idx, rep(1/length(c_MX), length(P_expx_Q)), sim_mat, c_MX, P_expx_Q, "conf_cost"))]
       toAdd <- q_new_idx 
     }else{
       toAdd <- arms[[curr_arm]][1]
@@ -149,7 +147,7 @@ bandit_search <- function(D_test, c_MX, true_misclass, B, tau=.65, clust_max=5, 
     ## Update utility
     ##
     P_expx_Q <- P_explainx_Q(sim_mat, solution, true_misclass, c_MX, tau)
-    utility <- c(utility, t(get("conf_cost")(c_MX, rep(1, length(P_expx_Q))) %*% P_expx_Q))
+    utility <- c(utility, t(get("conf_cost")(c_MX, rep(1/length(c_MX), length(P_expx_Q))) %*% P_expx_Q))
     
     ##
     ## Track reward

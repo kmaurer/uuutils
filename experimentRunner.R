@@ -1,7 +1,7 @@
-source("bansal_weld_functions.R")
-source("phi_functions.R")
-source("facility_locations_utility.R")
-source("bandits.R")
+source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/bansal_weld_functions.R")
+source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/phi_functions.R")
+source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/facility_locations_utility.R")
+source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/bandits.R")
 
 
 bansalWeldGreedySetNumber <- function(D_test, c_MX, true_misclass, Q_prime_idx, tau=.65,
