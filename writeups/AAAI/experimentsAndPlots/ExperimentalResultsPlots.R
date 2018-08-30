@@ -16,7 +16,7 @@ unique(bw_results$dataset)
 
 bw_monte_carlo_envelope <- bw_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
+                          labels=c("Pang04","Pang05","McAuley15","Kaggle13")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -44,8 +44,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-# ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
-#        height=6,width=8.4,units="in")
+ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
+       height=6,width=8.4,units="in")
 
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
@@ -64,7 +64,7 @@ for (dataset in datasetvec){
 }
 head(all_overconfidence)
 
-all_overconfidence$data_source <- factor(all_overconfidence$data_source,labels=c("Pang04","Pang05","Mcauley15","Kaggle13"))
+all_overconfidence$data_source <- factor(all_overconfidence$data_source,labels=c("Pang04","Pang05","McAuley15","Kaggle13"))
 
 ggplot()+
   geom_line(aes(x=c_MX,y=overconfidence),
@@ -88,7 +88,7 @@ unique(mb_results$phi)
 
 monte_carlo_envelope <- mb_results  %>%
   mutate(dataset = factor(dataset, levels=c("pang04Out.csv","pang05Out.csv","mcauley15Out.csv","kaggle"),
-                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
+                          labels=c("Pang04","Pang05","McAuley15","Kaggle13")) ) %>%
   group_by(phi, b, dataset) %>%
   summarize(lower=quantile(utility,.05),
             upper=quantile(utility,.95),
@@ -118,8 +118,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-# ggsave("flUtilPlaceholder.png", dpi=600,
-#        height=6,width=8.4,units="in")
+ggsave("flUtilPlaceholder.png", dpi=600,
+       height=6,width=8.4,units="in")
 
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
@@ -168,7 +168,7 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"),lak_smr) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Bandit","Coverage-Based","Facility Locations")),
          dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
-                          labels=c("Pang04","Pang05","Mcauley15","Kaggle13")) ) %>%
+                          labels=c("Pang04","Pang05","McAuley15","Kaggle13")) ) %>%
   arrange(dataset, algo)
 
 smr %>% 
@@ -206,8 +206,8 @@ ggplot() +
                         shape = guide_legend(reverse=T),
                         linetype = guide_legend(reverse=T))
 
-# ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=4,width=4,units="in")
+ggsave("discoveryRatioPlaceholder.png", dpi=600,
+       height=4,width=4,units="in")
 
 
 
