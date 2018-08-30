@@ -4,7 +4,7 @@ library(tidyverse)
 library(RColorBrewer)
 
 # algo_colors <- brewer.pal(n = 5,name = "Set1")[c(2,1,5)]
-algo_colors <- c("#d95f02","#1b9e77","#7570b3")
+algo_colors <- c("#d95f02","#1b9e77","#7570b3","#e7298a")
 
 setwd("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots")
 
@@ -45,7 +45,7 @@ ggplot()+
         legend.position = "bottom")
 
 # ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
-#        height=5,width=7,units="in")
+#        height=6,width=8.4,units="in")
 
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
@@ -117,7 +117,7 @@ ggplot()+
         legend.position = "bottom")
 
 # ggsave("flUtilPlaceholder.png", dpi=600,
-#        height=5,width=7,units="in")
+#        height=6,width=8.4,units="in")
 
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
@@ -125,6 +125,8 @@ ggplot()+
 
 # bw_results <- read.csv("bansalWeldAugust15.csv")
 # mb_results <- read.csv("maurerBennetteAugust15.csv")
+
+lak_results <- read.csv("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/outputFiles/lakkaraju.csv")
 
 bw_smr <- bw_results %>%
   filter(b==100) %>%
@@ -147,11 +149,22 @@ mb_smr <- mb_results %>%
             smrMedian = quantile(smr,.5),
             smrUpper = quantile(smr,.95)) 
 
+lak_smr <- lak_results %>%
+  filter(b==100) %>%
+  mutate(algo = factor(phi,levels=c("Bandits"),
+                       labels=c("Bandit")),
+         smr = found/(B-cumulativeConfidence),
+         dataset = ifelse(dataset=="kaggle13Out.csv","kaggle",as.character(dataset))) %>%
+  group_by(dataset, algo) %>%
+  summarize(smrLower = quantile(smr,.05),
+            smrMedian = quantile(smr,.5),
+            smrUpper = quantile(smr,.95)) 
 
-smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain")) %>%
-  filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain")) %>%
+
+smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"),lak_smr) %>%
+  filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain","Bandit")) %>%
   ungroup() %>%
-  mutate(algo = factor(algo, levels=c("Most Uncertain","Coverage-Based","Facility Locations")),
+  mutate(algo = factor(algo, levels=c("Most Uncertain","Bandit","Coverage-Based","Facility Locations")),
          dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
                           labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
   arrange(dataset, algo)
@@ -175,13 +188,13 @@ ggplot() +
                 position = "dodge", data=smr, size=1) +
   geom_point(aes(y=smrMedian, color=algo, x=dataset, shape=algo),
                 position=position_dodge(width=.5), data=smr, size=3) +
-  scale_color_manual("Algorithm:", values=algo_colors) +
-  scale_shape_manual("Algorithm:", values=15:17) +
+  scale_color_manual("Algorithm:", values=algo_colors[c(1,4,2,3)]) +
+  scale_shape_manual("Algorithm:", values=15:18) +
   # scale_linetype_manual("Algorithm:", values=1:3) +
   geom_hline(yintercept = 1) +
   scale_y_continuous(breaks=seq(0,10,2), 
                      limits=c(0,max(smr$smrUpper))) +
-  labs(y="Misclassification Discovery Ratio",
+  labs(y="Standardized Discovery Ratio",
        x="") +
   theme_bw() +
   theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
@@ -192,7 +205,7 @@ ggplot() +
                         linetype = guide_legend(reverse=T))
 
 # ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=3.5,width=3.5,units="in")
+#        height=4.5,width=4,units="in")
 
 
 
