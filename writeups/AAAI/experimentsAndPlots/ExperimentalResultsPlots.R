@@ -44,8 +44,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
-       height=6,width=8.4,units="in")
+# ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
+#        height=6,width=8.4,units="in")
 
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
@@ -118,8 +118,8 @@ ggplot()+
   theme(axis.title = element_text(size=15),
         legend.position = "bottom")
 
-ggsave("flUtilPlaceholder.png", dpi=600,
-       height=6,width=8.4,units="in")
+# ggsave("flUtilPlaceholder.png", dpi=600,
+#        height=6,width=8.4,units="in")
 
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
@@ -168,7 +168,7 @@ smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"),lak_smr) %>%
   ungroup() %>%
   mutate(algo = factor(algo, levels=c("Most Uncertain","Bandit","Coverage-Based","Facility Locations")),
          dataset = factor(dataset, levels=c("kaggle","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"),
-                          labels=c("Pang04","Pang05","McAuley15","Kaggle13")) ) %>%
+                          labels=c("Kaggle13","McAuley15","Pang05","Pang04")) ) %>%
   arrange(dataset, algo)
 
 smr %>% 
@@ -206,8 +206,8 @@ ggplot() +
                         shape = guide_legend(reverse=T),
                         linetype = guide_legend(reverse=T))
 
-ggsave("discoveryRatioPlaceholder.png", dpi=600,
-       height=4,width=4,units="in")
+# ggsave("discoveryRatioPlaceholder.png", dpi=600,
+#        height=4,width=4,units="in")
 
 
 
