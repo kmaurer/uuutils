@@ -1,8 +1,22 @@
+### Functions to run Facility Locations search based on greedy optimization of FL utility
+
+
+#---------------------------------------------------
+## Reward Function based on cost of log transformed geometric expection
+cost_c_MX <- function(c_MX){
+  log(1/(1-c_MX))
+}
+
+#---------------------------------------------------
+## Distances between points used to create distance penalty in FL utility
 make_dist_mat <- function(D_test){
   dist_mat <- as.matrix(dist(D_test)) 
   dist_mat / max(dist_mat)
 }
 
+
+#---------------------------------------------------
+## Function to calculate sum of minimum distances between test set and identified UUs
 min_dist <- function(dist_mat, S_idx){
   if(is.null(S_idx) | length(S_idx)==0){
     rep(1,nrow(dist_mat))
@@ -13,10 +27,8 @@ min_dist <- function(dist_mat, S_idx){
   }
 }
 
-cost_c_MX <- function(c_MX){
-  log(1/(1-c_MX))
-}
-
+#---------------------------------------------------
+## function to return index of point with highest expected FL utility based on current query set and phis
 best_candidate <- function(Q_idx, true_misclass, phi_D_test, dist_mat, c_MX, B, alpha=.5){
   if(is.null(Q_idx) | length(Q_idx)==0){
     candidates <-1:length(c_MX)
@@ -40,6 +52,9 @@ best_candidate <- function(Q_idx, true_misclass, phi_D_test, dist_mat, c_MX, B, 
   )]
 }
 
+
+#---------------------------------------------------
+## Function to run greedy search for FL utility
 fac_loc_utility_algorithm <- function(D_test, c_MX, true_misclass, Q_idx, B=10, tau=.65, prior=rep(.5, length(D_test)), 
                                     phi_mod_type="rf",clust_out, updateprior=FALSE, alpha=.5){
   # define

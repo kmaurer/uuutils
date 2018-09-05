@@ -1,4 +1,5 @@
-### Create modular functions for recreating and extending Bansal and Weld coverage-based utilities 
+### Create modular functions for recreating and extending Bansal and Weld coverage-based utilities
+# note: naming convension for arguments follows notation from B&W 2018 paper. 
 
 #---------------------------------------------------
 ### function to create nXn matrix of similarities scores between all pairs in test data
@@ -30,7 +31,6 @@ P_explainx_Q <- function(sim_mat, Q_idx, true_misclass, c_MX, tau, sigma=.1,...)
 make_Qc_index <- function(D_test_idx, Q_idx){
   D_test_idx[!D_test_idx %in% Q_idx]
 }
-# make_Qc_index(1:10,c(2,4,6,8))
 
 #---------------------------------------
 # define default cost function (matchs bansal and weld weights)
@@ -122,17 +122,3 @@ adaptive_query_comparison <- function(phi_mod_types = c("most_uncertain","omnisc
   })
   do.call(rbind, cost_results_list)
 } 
-# # Test Case components
-# D_test = as.matrix(pang04D_test[test_subset,])
-# c_MX = confidence[test_subset]
-# prior = 1-c_MX
-# true_misclass = misclass[test_subset]
-# clust_set=NULL
-# B=50
-# tau=.65
-# phi_mod_type = "omniscient"
-# dist_test = as.matrix(dist(D_test))
-# Q_idx = 1:20
-# sigma=.1
-# scale=T
-# timer <- Sys.time()

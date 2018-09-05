@@ -1,7 +1,7 @@
-# Functions for generating phi models using 
-# cluster-based (BW), logistic or random forests
-
-#!# these functions are a mess of if/else statements, need work to clarify
+### Functions for generating phi models using the following
+# cluster-based (B&W method) 
+# logistic (Our method in paper) 
+# random forests (Omitted in paper for brevity)
 
 #---------------------------------------
 ### cluster elbow function
@@ -31,6 +31,7 @@ UUclust <- function(D_test, c_MX, clust_max=5, clust_set=NULL){
     clust_out
   }
 }
+## Use Example:
 # D_test <- as.matrix(iris[,1:4])
 # c_MX <- runif(nrow(D_test),0,1)
 # clust_out <- UUclust(D_test, c_MX, clust_max=5)
@@ -52,6 +53,7 @@ clust_phi <- function(true_misclass, D_test, Q_idx, clust_out, c_MX,
     (lambda*prior[x_idx] + clust_UU[clust_out[x_idx]]) / (lambda+clust_size[clust_out[x_idx]])
   })
 }
+## Use Example:
 # D_test <- as.matrix(iris[,1:4])
 # c_MX <- runif(nrow(D_test),0,1)
 # true_misclass <- sample(0:1,nrow(D_test),replace=T)
@@ -60,12 +62,9 @@ clust_phi <- function(true_misclass, D_test, Q_idx, clust_out, c_MX,
 # clust_phi(misclass=true_misclass, D_test, Q_idx, clust_out,
 #           c_MX, prior_type="unif", lambda=2, tau=.65)
 
+
 #---------------------------------------
 ### model-based phi function  P[M(X)!=y_X | Q]
-# misclass is a boolean vector indicating misclassifications for observations in Q
-# Q is bXp matrix of features for corresponding observations in oracle query set
-# X is nXp of matrix of features
-
 model_phi <- function(true_misclass, D_test, Q_idx, c_MX, mod_type = "rf", 
                       prior=rep(.5, length(D_test)), updateprior=FALSE, lambda=10, tau=.65){
   Q_dat <- data.frame(UU=as.factor(as.numeric(true_misclass==1 & c_MX > tau))[Q_idx],
@@ -84,12 +83,14 @@ model_phi <- function(true_misclass, D_test, Q_idx, c_MX, mod_type = "rf",
   if(updateprior) phi_val <- ((1-c_MX)*lambda + phi_val*length(Q_idx)) / (lambda + length(Q_idx))
   phi_val
 }
+## Use Example:
 # model_phi(true_misclass=sample(0:1,150,replace=T),
 #         D_test=as.matrix(iris[,1:4]),
 #         c_MX=runif(150),Q_idx=1:25)
 
+
 #----------------------------------------
-#!# Make this less of a mess next week
+### Function to convert phi to match specified structure
 phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, length(D_test)), 
                     phi_mod_type="rf",clust_out, updateprior=FALSE, lambda=2){
   if(phi_mod_type == "omniscient"){ 
@@ -102,8 +103,6 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
                                 prior=prior, tau=tau, updateprior=updateprior, lambda=lambda)
       } else {
         phi_D_test <-1-c_MX
-        # phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
-        #                        c_MX, prior=prior, lambda=lambda, tau=tau)
       }
       
     } else if(phi_mod_type == "logistic"){ 
@@ -113,8 +112,6 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
                                 prior=prior, tau=tau,updateprior=updateprior, lambda=lambda)
       } else {
         phi_D_test <-1-c_MX
-        # phi_D_test <-clust_phi(true_misclass=true_misclass, D_test, Q_idx, clust_out,
-        #                        c_MX, prior=prior, lambda=lambda, tau=tau)
       }
       
     } else if(phi_mod_type == "cluster_prior") {
@@ -128,6 +125,7 @@ phi_all <- function(D_test, c_MX, true_misclass, Q_idx, tau=.65, prior=rep(.5, l
   }
   return(phi_D_test)
 }
+## Use Example:
 # phi_all(D_test=as.matrix(iris[,1:4]),
 #         true_misclass=sample(0:1,150,replace=T),
 #         Q_idx=1:25, c_MX=runif(150), tau=.65, phi_mod_type="rf")
