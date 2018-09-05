@@ -18,8 +18,8 @@ library(tidyr)
 
 ```{r}
 sampsize = 1000
-Iterations = 2
-B = 50
+Iterations = 1000
+B = 100
 datasets <- c('pang04Out.csv', 'pang05Out.csv', 'mcauley15Out.csv', 'kaggle13Out.csv')
 path <- '/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/inputFiles/'
 ```
@@ -85,8 +85,7 @@ for(set in datasets){
 bansalWeld <- three
 rm(three)
 bansalWeld$utilityType <- "BansalWeld"
-
-
+readr::write_csv(bansalWeld, 'bansalWeld.csv')
 ```
 
 
@@ -156,7 +155,7 @@ for(set in datasets){
 facilityLocation <- three
 rm(three)
 facilityLocation$utilityType <- "FacilityLocation"
-
+readr::write_csv(facilityLocation, 'facilityLocation.csv')
 ```
 
 
