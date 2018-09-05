@@ -1,8 +1,6 @@
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/phi_functions.R")
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/bansal_weld_functions.R")
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/facility_locations_utility.R")
-
-
+##
+## Needs access to functions in "bansa_weld_functions.R", "facility_locations_utility.R", and "phi_functions.R"
+##
 
 bandit_search <- function(D_test, c_MX, true_misclass, B, tau=.65, clust_max=5, clust_set=NULL, sigma=.001, scale=TRUE){
   

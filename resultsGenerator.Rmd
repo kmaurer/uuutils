@@ -18,8 +18,8 @@ library(tidyr)
 
 ```{r}
 sampsize = 1000
-Iterations = 1000
-B = 100
+Iterations = 2
+B = 50
 datasets <- c('pang04Out.csv', 'pang05Out.csv', 'mcauley15Out.csv', 'kaggle13Out.csv')
 path <- '/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/inputFiles/'
 ```
@@ -90,7 +90,7 @@ bansalWeld$utilityType <- "BansalWeld"
 ```
 
 
-## Maurer Bennette
+## Facility Location
 
 ```{r}
 phi_mod_types <- c("cluster_prior", "most_uncertain", "logistic")
@@ -120,7 +120,7 @@ for(set in datasets){
     
     
     res_list <- lapply(phi_mod_types, function(phi){
-      maurerBennetteGreedyBudget(D_test[samples,],
+      facilityLocationGreedyBudget(D_test[samples,],
                                     c_MX[samples],
                                     true_misclass[samples],
                                     B = B,
@@ -153,9 +153,9 @@ for(set in datasets){
   } 
   
 }
-maurerBennette <- three
+facilityLocation <- three
 rm(three)
-maurerBennette$utilityType <- "MaurerBennette"
+facilityLocation$utilityType <- "FacilityLocation"
 
 ```
 
@@ -213,7 +213,7 @@ bandits <- three
 rm(three)
 bandits$utilityType <- "Bandits"
 
-#readr::write_csv(bandits, "/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/outputFiles/Lakkaraju.csv")
+readr::write_csv(bandits, "/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/outputFiles/Lakkaraju.csv")
 ```
 
 
@@ -221,7 +221,7 @@ bandits$utilityType <- "Bandits"
 
 ```{r}
 
-final <- rbind(bandits, bansalWeld, maurerBennette %>% select(-reward, -sum_min_dist))
+final <- rbind(bandits, bansalWeld, facilityLocation %>% select(-reward, -sum_min_dist))
 
 ```
 
@@ -229,7 +229,7 @@ final <- rbind(bandits, bansalWeld, maurerBennette %>% select(-reward, -sum_min_
 ## Plot
 
 ```{r}
-spot = 100
+spot = 50
 
 bw_smr <- bansalWeld %>%
           filter(b==spot) %>%
@@ -240,7 +240,7 @@ bw_smr <- bansalWeld %>%
                     smrMedian = quantile(smr,.5),
                     smrUpper = quantile(smr,.95))
 
-mb_smr <- maurerBennette %>%
+fl_smr <- facilityLocation %>%
           filter(b==spot) %>%
           mutate(algo = factor(phi, levels=c("cluster_prior","logistic","most_uncertain"), labels=c("Cluster FL","Facility Locations","Most Uncertain")),
                  smr = found/(B-cumulativeConfidence)) %>%
@@ -259,7 +259,7 @@ bandits_smr <- bandits %>%
                          smrUpper = quantile(smr,.95)) 
 
 
-smr <- rbind(bw_smr, filter(mb_smr, algo != "Most Uncertain"), bandits_smr) %>%
+smr <- rbind(bw_smr, filter(fl_smr, algo != "Most Uncertain"), bandits_smr) %>%
        filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain", "Bandits", "Cluster FL")) %>%
        ungroup() %>%
        mutate(dataset = factor(dataset, levels=c("kaggle13Out.csv","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"), labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
