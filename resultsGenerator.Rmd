@@ -213,7 +213,7 @@ bandits <- three
 rm(three)
 bandits$utilityType <- "Bandits"
 
-readr::write_csv(bandits, "/home/bennettew/Documents/Summer2018/unknownUnknowns/writing/experimentsAndPlots/outputFiles/Lakkaraju.csv")
+readr::write_csv(bandits, "Lakkaraju.csv")
 ```
 
 
@@ -224,78 +224,3 @@ readr::write_csv(bandits, "/home/bennettew/Documents/Summer2018/unknownUnknowns/
 final <- rbind(bandits, bansalWeld, facilityLocation %>% select(-reward, -sum_min_dist))
 
 ```
-
-
-## Plot
-
-```{r}
-spot = 50
-
-bw_smr <- bansalWeld %>%
-          filter(b==spot) %>%
-          mutate(algo = factor(phi, levels=c("cluster_prior","most_uncertain"), labels=c("Coverage-Based","Most Uncertain")),
-                 smr = found/(B-cumulativeConfidence)) %>%
-          group_by(dataset, algo) %>%
-          summarize(smrLower = quantile(smr,.05),
-                    smrMedian = quantile(smr,.5),
-                    smrUpper = quantile(smr,.95))
-
-fl_smr <- facilityLocation %>%
-          filter(b==spot) %>%
-          mutate(algo = factor(phi, levels=c("cluster_prior","logistic","most_uncertain"), labels=c("Cluster FL","Facility Locations","Most Uncertain")),
-                 smr = found/(B-cumulativeConfidence)) %>%
-          group_by(dataset, algo) %>%
-          summarize(smrLower = quantile(smr,.05),
-                    smrMedian = quantile(smr,.5),
-                    smrUpper = quantile(smr,.95)) 
-
-bandits_smr <- bandits %>%
-               filter(b==spot) %>%
-               mutate(algo = factor(phi,levels=c("Bandits"), labels=c("Bandits")),
-                      smr = found/(B-cumulativeConfidence)) %>%
-               group_by(dataset, algo) %>%
-               summarize(smrLower = quantile(smr,.05),
-                         smrMedian = quantile(smr,.5),
-                         smrUpper = quantile(smr,.95)) 
-
-
-smr <- rbind(bw_smr, filter(fl_smr, algo != "Most Uncertain"), bandits_smr) %>%
-       filter(algo %in% c("Coverage-Based","Facility Locations","Most Uncertain", "Bandits", "Cluster FL")) %>%
-       ungroup() %>%
-       mutate(dataset = factor(dataset, levels=c("kaggle13Out.csv","mcauley15Out.csv","pang05Out.csv","pang04Out.csv"), labels=c("kaggle13","mcauley15","pang05","pang04")) ) %>%
-       arrange(dataset, algo)
-
-smr %>% 
-  group_by(dataset) %>%
-  mutate(vs_fl = smrMedian[algo=="Facility Locations"]/smrMedian)
-
-
-ggplot() +
-  geom_errorbar(aes(ymin=smrLower,ymax=smrUpper,
-                    color=algo, x=dataset),width=.5,
-                position = "dodge", data=smr, size=1) +
-  geom_point(aes(y=smrMedian, color=algo, x=dataset, shape=algo),
-             position=position_dodge(width=.5), data=smr, size=3) +
-  geom_hline(yintercept = 1) +
-  scale_y_continuous(breaks=seq(0,10,2), 
-                     limits=c(0,max(smr$smrUpper))) +
-  labs(y="Misclassification Discovery Ratio",
-       x="") +
-  theme_bw() +
-  theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
-        axis.text.y= element_text(angle=90, hjust=.5),
-        legend.background =  element_rect(color="black"))+
-  coord_flip() + guides(colour = guide_legend(reverse=T),
-                        shape = guide_legend(reverse=T),
-                        linetype = guide_legend(reverse=T))
-
-
-```
-
-
-
-
-
-
-
-

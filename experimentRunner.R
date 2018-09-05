@@ -1,15 +1,9 @@
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/bansal_weld_functions.R")
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/phi_functions.R")
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/facility_locations_utility.R")
-source("/home/bennettew/Documents/Summer2018/unknownUnknowns/uuutils/bandits.R")
+## Source all algorithm functions
+source("bansal_weld_functions.R")
+source("phi_functions.R")
+source("facility_locations_utility.R")
+source("bandits.R")
 
-
-
-
-
-
-
-##
 ## This function runs the Bansal Weld Greedy search
 ## for a set budget, phi_mod_type, and cost_fctn_vec
 ##
