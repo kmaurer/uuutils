@@ -48,7 +48,8 @@ server <- function(input, output) {
     return(df)
   })
   
-   
+  
+  output$query <- renderImage(src = dat()$FileName[1], deleteFile = FALSE)
   
   
 
