@@ -22,14 +22,17 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      imageOutput('query'), offset = 1)
+      
+      fluidRow(column(12, imageOutput('query'))),
+      fluidRow(
+               column(2, actionButton('correct', "Correct")),
+               column(2, actionButton('incorrect', "Incorrect")),
+               column(2, textOutput('text'))
+               )
+      
+      
     )
-    
-    
-
-  
-  
-  
+  )
 )
 
 # Define server logic required to draw a histogram
@@ -40,18 +43,42 @@ server <- function(input, output) {
   ##
   dat <- reactive({
     req(input$file1)
-    
-    df <- read.csv(input$file1$datapath,
-                   header = input$header,
-                   sep = input$sep,
-                   quote = input$quote)
-    return(df)
+    return(read.csv(input$file1$datapath))
   })
   
+
   
-  output$query <- renderImage(src = dat()$FileName[1], deleteFile = FALSE)
+  ##
+  ## Select image
+  ##
+  X <- reactive(c(1:dim(dat())[1]))
+  Q <- c(1, 2, 3)
   
   
+  
+  query <- reactive({
+    toReturn <- 1
+    if(input$method== 1){      ## Random
+      toReturn <- sample(X()[! X() %in% Q], 1)
+    }
+    if(input$method == 2){      ## Most uncertain
+      
+    }
+    if(input$method == 3){      ## Facility location
+      
+    }
+    return(toReturn)
+  })
+
+  
+  
+  
+  output$text <- renderText(paste(Q, collapse = ", "))
+  
+  ##
+  ## Render selected image
+  ##
+  output$query <- renderImage({list(src = as.character(dat()$FileName[query()]), width = 350, height = 350)}, deleteFile = FALSE)
 
 
 }
