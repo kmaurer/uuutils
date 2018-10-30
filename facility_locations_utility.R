@@ -42,6 +42,7 @@ best_candidate <- function(Q_idx, true_misclass, phi_D_test, dist_mat, c_MX, B, 
   sum_dist_S <- sum(min_dist_S)
   # current_sum <- ifelse(is.null(S_idx),0,sum(c_MX[S_idx]))
   current_sum <- ifelse(is.null(S_idx),0,sum(cost_c_MX(c_MX[S_idx])))
+  print("start sort")
   candidates[which.max(
     sapply(candidates, function(q){
       # phi_D_test[q] * (scale_reward*(c_MX[q] + current_sum) - scale_min_dist*sum(ifelse(min_dist_S < dist_mat[,q],min_dist_S, dist_mat[,q]))) +
