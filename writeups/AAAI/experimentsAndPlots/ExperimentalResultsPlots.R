@@ -335,6 +335,7 @@ ggplot()+
   scale_color_manual("",values=c("black","black"))+
   labs(x="Model Confidence", y="Accuracy")+
   theme_bw()+
+  theme(legend.position = "bottom")+
   coord_fixed()
 # ggsave("overconfidence_2.png",dpi=600,width=4,height=3.8,units="in")
 
