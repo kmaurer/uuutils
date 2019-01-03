@@ -232,7 +232,7 @@ We empirically evaluate our facility location utility model by applying Algorith
 The classifiers for Pang04, Pang05, and McAuley15 use logistic regression with unigram features. The derived feature space used for the UUs search is created with singular value decomposition on unigram features from only the test set. The classifier for the Kaggle13 dataset is a CNN (eight convolutional layers and two linear layers), and the derived feature space is created with singular value decomposition on raw pixel values.
 
 \begin{figure}[hbtp]
-  \includegraphics[width=.45\textwidth]{overconfidence_2.png}
+  \includegraphics[width=.49\textwidth]{overconfidence_2.png}
   \caption{Observed classifier overconfidence profiles of each experimental dataset.}
   \label{fig:overconf}
 \end{figure}
@@ -277,17 +277,21 @@ Previous literature has defined unknown unknowns as any highly confident predict
 
 Through repeated random initialization in our computational experiments, we thoroughly tested the outcomes of our facility locations utility algorithm against the bandit, coverage-based, and most uncertain search algorithms. We have demonstrated the ability of our greedy algorithm, using logistic regression probability estimates for $\hat{\phi}(x)$ in the optimization step, to consistently obtain strong facility locations utility in four data scenarios with disparate overconfidence profiles. This is important because in real-world applications we would not know the overconfidence behavior a priori to our query search, so we require a versatile estimation method. We have also demonstrated that oracle queries gathered using a facility locations utility search tend to have higher standardized discovery ratios than the alternative algorithms, thus represent a more efficient use of the constrained budget for queries. 
 
-The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through the github repository at \km{\url{www.github.com/kmaurer/uuutils}}.
+%The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through the github repository at \km{\url{www.github.com/kmaurer/uuutils}}.
+
+The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through [online repository link removed for blinding].
 
 There are many avenues for future work related to the facility locations utility methods that we have presented. First, the facility locations utility model structure separates the discovery reward and coverage proximity components, which could allow separate rescaling to weight each component in line with the priorities of an application, or use of non-Euclidean distances. Next, exploratory methods could be developed to evaluate what the query set tells us about the overconfidence of your model, perhaps interpreting the structure of the models used to predict $\hat{\phi}(x)$ to better understand what features are related to overconfidence. Additionally, we have proposed a greedy solution for the facilities location problem that updates after each oracle query, but non-sequential solutions could be employed to select sets of points to query at each iteration. Lastly, there may be cases where it is impractical to collect a large enough oracle query set to refit the original classifier, but it may be sufficient to estimate the original classifier’s overconfidence and perform recalibration so that actions taken based on the predictions can include more appropriate risk mitigation. 
 
 \section{Acknowledgments} 
 
-Support for this research was provided by the Visiting Summer Faculty Program and Extension Grants sponsored by the Griffiss Institute, in collaboration with the Air Force Research Lab. 
+Acknowledgements removed for blinding.
 
-We would like to thank Dr. Eric Heim, Dylan Elliott, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
+%Support for this research was provided by the Visiting Summer Faculty Program and Extension Grants sponsored by the Griffiss Institute, in collaboration with the Air Force Research Lab. 
 
-Cleared for public release by WPAFB Public Affairs on 18 Sep 2018, case number 88ABW2018-4629.  Any opinions, findings and conclusions or recommendations expressed in this work are those of the author and do not necessarily reflect the view of the United States Air Force.
+%We would like to thank Dr. Eric Heim, Dylan Elliott, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
+
+%Cleared for public release by WPAFB Public Affairs on 18 Sep 2018, case number 88ABW2018-4629.  Any opinions, findings and conclusions or recommendations expressed in this work are those of the author and do not necessarily reflect the view of the United States Air Force.
 
 \newpage
 
