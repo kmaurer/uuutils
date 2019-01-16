@@ -279,7 +279,7 @@ Through repeated random initialization in our computational experiments, we thor
 
 %The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through the github repository at \km{\url{www.github.com/kmaurer/uuutils}}.
 
-The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through [online repository link removed for blinding].
+The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \citep{R} of the facility locations algorithm and associated functions through the [package name blinded] R package can be accessed through [online repository link removed for blinding].
 
 There are many avenues for future work related to the facility locations utility methods that we have presented. First, the facility locations utility model structure separates the discovery reward and coverage proximity components, which could allow separate rescaling to weight each component in line with the priorities of an application, or use of non-Euclidean distances. Next, exploratory methods could be developed to evaluate what the query set tells us about the overconfidence of your model, perhaps interpreting the structure of the models used to predict $\hat{\phi}(x)$ to better understand what features are related to overconfidence. Additionally, we have proposed a greedy solution for the facilities location problem that updates after each oracle query, but non-sequential solutions could be employed to select sets of points to query at each iteration. Lastly, there may be cases where it is impractical to collect a large enough oracle query set to refit the original classifier, but it may be sufficient to estimate the original classifier’s overconfidence and perform recalibration so that actions taken based on the predictions can include more appropriate risk mitigation. 
 
@@ -293,7 +293,6 @@ Acknowledgements removed for blinding.
 
 %Cleared for public release by WPAFB Public Affairs on 18 Sep 2018, case number 88ABW2018-4629.  Any opinions, findings and conclusions or recommendations expressed in this work are those of the author and do not necessarily reflect the view of the United States Air Force.
 
-\newpage
 
 \bibliography{librarySmall}
 \bibliographystyle{icml2019}

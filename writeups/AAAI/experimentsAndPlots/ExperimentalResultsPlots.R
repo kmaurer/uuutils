@@ -51,10 +51,11 @@ ggplot()+
 # Figure 2: overconfidence plot
 
 # create cubic splines model to fit rate of correct class as function of confidence
-datasetvec <- c("pang04","pang05","mcauley15","kaggle13")
+# datasetvec <- c("pang04","pang05","mcauley15","kaggle13")
+datasetvec <- c("pang04","pang05","mcauley15","kaggle13","images")
 all_overconfidence <- NULL
 for (dataset in datasetvec){
-  dat <- read.csv(paste0("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/inputFiles/",dataset,"_predictionResults.csv"))
+  dat <- read.csv(paste0("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots/inputFiles/",dataset,"_predictionResults.csv"))
   dat <- dplyr::filter(dat, Confidence > .65, Prediction==1)
   mod <- lm(1-dat$Misclassified ~ splines::bs(dat$Confidence, 3))
   all_overconfidence <- rbind(all_overconfidence,
@@ -291,19 +292,53 @@ ggplot() +
 # Alternative for Figure 2: overconfidence plot via histogram-gap plot
 
 # create cubic splines model to fit rate of correct class as function of confidence
+# datasetvec <- c("pang04","pang05","mcauley15","kaggle13","images")
+# all_overconfidence <- NULL
+# for (dataset in datasetvec){
+#   dat <- read.csv(paste0("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots/inputFiles/",dataset,"_predictionResults.csv"))
+#   dat <- dplyr::filter(dat, Confidence > .65, Prediction==1)
+#   mod <- lm(1-as.numeric(dat$Misclassified) ~ splines::bs(dat$Confidence, 3))
+#   all_overconfidence <- rbind(all_overconfidence,
+#                               data.frame(c_MX =dat$Confidence,
+#                                          misclass = dat$Misclassified,
+#                                          overconfidence = dat$Confidence - predict(mod, data.frame(c_MX=dat$Confidence)),
+#                                          data_source = dataset)) 
+# }
+# head(all_overconfidence)
+# 
+# bin_widths = .05
+# bin_breaks = seq(.65,1,by=bin_widths)
+# bin_centers = seq(.65+bin_widths/2,1-bin_widths/2,by=bin_widths)
+# 
+# overconf_bins <- all_overconfidence %>%
+#   mutate(data_source = factor(all_overconfidence$data_source,labels=c("Pang04","Pang05","McAuley15","Kaggle13","ImagesBlackWhite")),
+#          conf_bin = cut(all_overconfidence$c_MX,breaks=bin_breaks)) %>%
+#   group_by(data_source,conf_bin) %>%
+#   summarize(count=n(),
+#             observed= sum(misclass==0)/count)%>%
+#   mutate(expected = bin_centers[as.numeric(conf_bin)],
+#          xmin=expected-bin_widths/2,
+#          xmax=expected+bin_widths/2) %>%
+#   gather(key="type",value="accuracy",observed:expected) %>%
+#   mutate(type = factor(type, levels=c("expected","observed"),
+#                        labels=c("Overconfidence","Observed Accuracy")))%>%
+#   arrange(type)
+# head(overconf_bins)
+
+
+# create cubic splines model to fit rate of correct class as function of confidence
 datasetvec <- c("pang04","pang05","mcauley15","kaggle13")
 all_overconfidence <- NULL
 for (dataset in datasetvec){
-  dat <- read.csv(paste0("C:/Users/maurerkt/Google Drive/AFRLSFFP/Summer2018/writeups/AAAI/data/inputFiles/",dataset,"_predictionResults.csv"))
+  dat <- read.csv(paste0("C:/Users/maurerkt/Documents/GitHub/uuutils/writeups/AAAI/experimentsAndPlots/inputFiles/",dataset,"_predictionResults.csv"))
   dat <- dplyr::filter(dat, Confidence > .65, Prediction==1)
-  mod <- lm(1-dat$Misclassified ~ splines::bs(dat$Confidence, 3))
+  if(dataset=="images") dat$Misclassified <- ifelse(dat$Misclassified=="True",1,0)
   all_overconfidence <- rbind(all_overconfidence,
                               data.frame(c_MX =dat$Confidence,
                                          misclass = dat$Misclassified,
-                                         overconfidence = dat$Confidence - predict(mod, data.frame(c_MX=dat$Confidence)),
                                          data_source = dataset)) 
 }
-head(all_overconfidence)
+tail(all_overconfidence)
 
 bin_widths = .05
 bin_breaks = seq(.65,1,by=bin_widths)
@@ -325,11 +360,12 @@ overconf_bins <- all_overconfidence %>%
 head(overconf_bins)
 
 
+
 ggplot()+
   geom_rect(aes(xmin=xmin, xmax=xmax, ymin=0, ymax=accuracy, color=type,fill=type), data=overconf_bins) +
   annotate(geom="segment", x=.65,y=.65,xend=1,yend=1, size=1, color="gray30",linetype=2) +
-  facet_grid(.~data_source)+
-  scale_x_continuous(breaks=c(.7,.8,.9,1))+
+  facet_grid(~data_source)+
+  scale_x_continuous(breaks=c(.6,.7,.8,.9,1))+
   scale_y_continuous(breaks=seq(0,1,by=.2))+
   scale_fill_manual("",values=c("#f77c01","#81d1f9"))+
   scale_color_manual("",values=c("black","black"))+
@@ -337,6 +373,6 @@ ggplot()+
   theme_bw()+
   theme(legend.position = "bottom")+
   coord_fixed()
-# ggsave("overconfidence_2.png",dpi=600,width=4,height=3.8,units="in")
+# ggsave("overconfidence_2.png",dpi=600,width=4.1,height=3.8,units="in")
 
   
