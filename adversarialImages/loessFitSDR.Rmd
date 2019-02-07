@@ -1,0 +1,56 @@
+---
+title: "MAE vs Confidence"
+author: "Karsten Maurer"
+date: "February 7, 2019"
+output: pdf_document
+---
+
+```{r cars}
+library(tidyverse)
+setwd("C:\\Users\\maurerkt\\Documents\\GitHub\\uuutils\\adversarialImages")
+dat <- read.csv("dataForKarsten.csv")
+head(dat)
+
+# # plot (no log)
+# ggplot(aes(x=Confidence, y=MAE), data=dat)+
+#   geom_point(alpha=.2)+
+#   stat_smooth(method="loess", span = 0.1, se=FALSE)+
+#   theme_bw()
+
+# plot (with log)
+ggplot(aes(x=Confidence, y=log(MAE)), data=dat)+
+  geom_point(alpha=.2)+
+  stat_smooth(method="loess", span = 0.1, se=FALSE)+
+  theme_bw()
+
+# create log MAE column
+dat$logMAE <- log(dat$MAE)
+# fit loess smoother - a non-parametric "sliding average" line, then recode residuals of all points
+line <- loess(logMAE ~ Confidence, data=dat, span=.1)
+dat$resids <- line$residuals
+# Alternatively could calculate from plugging data back through prediction function
+dat$resids2 <- dat$logMAE - predict(line, newdata=dat)
+#!# Note: any fitted model that allows predictions for logMAE could replace loess
+
+# Take top B largest negative resids with conf > .65
+B=100
+queryset <- dat %>% 
+  dplyr::filter(Confidence > .65) %>%
+  arrange(resids) %>% 
+  head(100) 
+
+# which images are picked?
+ggplot()+
+  geom_point(aes(x=Confidence, y=log(MAE)), data=dat,
+             alpha=.2)+
+  stat_smooth(aes(x=Confidence, y=log(MAE)), data=dat, 
+              method="loess", span = 0.1, se=FALSE)+
+  geom_point(aes(x=Confidence, y=log(MAE)), data=queryset,
+             color="red")+
+  theme_bw()
+
+# what is the SDR?
+sdr = sum(queryset$Misclassified == "True")/(B-sum(queryset$Confidence))
+sdr
+
+```
