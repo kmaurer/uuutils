@@ -1,14 +1,18 @@
 \def\year{2019}\relax
 %File: formatting-instruction.tex
-\documentclass[letterpaper]{article} %DO NOT CHANGE THIS
-\usepackage{aaai19}  %Required
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{times}  %Required
 \usepackage{helvet}  %Required
 \usepackage{courier}  %Required
 \usepackage{url}  %Required
 \usepackage{graphicx}  %Required
-\usepackage{amssymb}
-\usepackage{amsmath}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{xcolor}
 \usepackage[sort&compress,square,comma,authoryear]{natbib}
 
 \usepackage{amsfonts}
@@ -40,14 +44,25 @@
 \newcommand{\km}[1]{{\color{red} #1}} %red comments: 
 \newcommand{\wdb}[1]{{\color{blue} #1}} %blue comments:
 
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-% The file aaai.sty is the style file for AAAI Press 
-% proceedings, working notes, and technical reports.
-%
+
 \title{Facility Locations Utility for Uncovering Classifier Overconfidence}
-\author{Karsten Maurer$^1$ \hspace{.2in} Walter Bennette$^2$\\
-$^1$Miami University Department of Statistics - maurerkt@miamioh.edu\\ 
-$^2$Air Force Research Lab Information Directorate - walter.bennette.1@us.af.mil \\
+
+\author{\IEEEauthorblockN{Author 1}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+\and
+\IEEEauthorblockN{Author 2}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
 }
 
 \maketitle
