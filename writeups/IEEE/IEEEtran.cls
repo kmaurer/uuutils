@@ -3162,7 +3162,7 @@ between column types.}%
 \@IEEEcompsocnotconfonly{\def\@biblabel#1{[#1]\hfill}}
 
 % controls bib item spacing
-\def\IEEEbibitemsep{0pt plus .5pt}
+\def\IEEEbibitemsep{0pt plus -.3pt}
 
 \@IEEEcompsocconfonly{\def\IEEEbibitemsep{1\baselineskip plus 0.25\baselineskip minus 0.25\baselineskip}}
 

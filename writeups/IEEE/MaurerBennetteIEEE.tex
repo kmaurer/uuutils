@@ -1,6 +1,6 @@
 \def\year{2019}\relax
 %File: formatting-instruction.tex
-\documentclass[10pt, conference, compsocconf]{IEEEtran}
+\documentclass[10pt, conference]{IEEEtran}
 % \IEEEoverridecommandlockoutsF
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{times}  %Required
@@ -44,25 +44,23 @@
 \newcommand{\km}[1]{{\color{red} #1}} %red comments: 
 \newcommand{\wdb}[1]{{\color{blue} #1}} %blue comments:
 
-
-
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
 \title{Facility Locations Utility for Uncovering Classifier Overconfidence}
 
-\author{\IEEEauthorblockN{Author 1}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
+\author{\IEEEauthorblockN{Karsten Maurer }
+\IEEEauthorblockA{\textit{Department of Statistics} \\
+\textit{Miami University}\\
+Oxford, USA \\
+maurerkt@miamioh.edu}
 \and
-\IEEEauthorblockN{Author 2}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
+\IEEEauthorblockN{Walter Bennette}
+\IEEEauthorblockA{\textit{Information Directorate} \\
+\textit{Air Force Research Lab}\\
+Rome, USA\\
+walter.bennette.1@us.af.mil}
 }
 
 \maketitle
@@ -246,21 +244,19 @@ Previous literature has defined unknown unknowns as any highly confident predict
 
 Through repeated random initialization in our computational experiments, we thoroughly tested the outcomes of our facility locations utility algorithm against the bandit, coverage-based, and most uncertain search algorithms. We have demonstrated the ability of our greedy algorithm, using logistic regression probability estimates for $\hat{\phi}(x)$ in the optimization step, to consistently obtain strong facility locations utility in four data scenarios with disparate overconfidence profiles. This is important because in real-world applications we would not know the overconfidence behavior a priori to our query search, so we require a versatile estimation method. We have also demonstrated that oracle queries gathered using a facility locations utility search tend to have higher standardized discovery ratios than the alternative algorithms, thus represent a more efficient use of the constrained budget for queries. 
 
-%The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \cite{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through the github repository at \km{\url{www.github.com/kmaurer/uuutils}}.
+The source code and datasets needed for replicating the experimental results discussed in this paper are available online in the supplemental materials for this manuscript. Also, an on open source  implementation in R \cite{R} of the facility locations algorithm and associated functions through the \km{\texttt{uuutils}} R package can be accessed through the github repository at \km{\url{www.github.com/kmaurer/uuutils}}.
 
-The source code and datasets needed for replicating the experimental results discussed in this paper are available in the supplemental materials for this manuscript. Also, an on open source  implementation in R \cite{R} of the facility locations algorithm and associated functions through the [package name blinded] R package can be accessed through [repository url removed for blinding].
+%The source code and datasets needed for replicating the experimental results discussed in this paper are available in the supplemental materials for this manuscript. Also, an on open source  implementation in R \cite{R} of the facility locations algorithm and associated functions through the [package name blinded] R package can be accessed through [repository url removed for blinding].
 
 There are many avenues for future work related to the facility locations utility methods that we have presented. First, the facility locations utility model structure separates the discovery reward and coverage proximity components, which could allow separate rescaling to weight each component in line with the priorities of an application, or use of non-Euclidean distances. Next, exploratory methods could be developed to evaluate what the query set tells us about the overconfidence of your model, perhaps interpreting the structure of the models used to predict $\hat{\phi}(x)$ to better understand what features are related to overconfidence. Additionally, we have proposed a greedy solution for the facilities location problem that updates after each oracle query, but non-sequential solutions could be employed to select sets of points to query at each iteration. Lastly, there may be cases where it is impractical to collect a large enough oracle query set to refit the original classifier, but it may be sufficient to estimate the original classifier’s overconfidence and perform recalibration so that actions taken based on the predictions can include more appropriate risk mitigation. 
 
 \section{Acknowledgments} 
 
-Acknowledgements removed for blinding.
+Support for this research was provided by the Visiting Summer Faculty Program and Extension Grants sponsored by the Griffiss Institute, in collaboration with the Air Force Research Lab. 
 
-%Support for this research was provided by the Visiting Summer Faculty Program and Extension Grants sponsored by the Griffiss Institute, in collaboration with the Air Force Research Lab. 
+We would like to thank Dr. Eric Heim, Dylan Elliott, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
 
-%We would like to thank Dr. Eric Heim, Dylan Elliott, and Dr. John Bailer for providing valuable feedback throughout the development of these methods. 
-
-%Cleared for public release by WPAFB Public Affairs on 18 Sep 2018, case number 88ABW2018-4629.  Any opinions, findings and conclusions or recommendations expressed in this work are those of the author and do not necessarily reflect the view of the United States Air Force.
+Cleared for public release by WPAFB Public Affairs on 18 Sep 2018, case number 88ABW2018-4629.  Any opinions, findings and conclusions or recommendations expressed in this work are those of the author and do not necessarily reflect the view of the United States Air Force.
 
 
 \bibliographystyle{IEEEtran}
