@@ -35,18 +35,20 @@ ggplot()+
               data=bw_monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo),
             data=bw_monte_carlo_envelope,size=1.5)+
-  facet_wrap(~dataset, scales="free_y",nrow=2)+
+  facet_wrap(~dataset, scales="free_y",nrow=1)+
   scale_color_manual("Algorithm:", values=algo_colors[c(1,2)])+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,2)])+
   theme_bw()+
   labs(x="Query Step (b)",
        y="Coverage-Based Utility")+
-  theme(axis.title = element_text(size=15),
+  theme(axis.title = element_text(size=12),
         legend.position = "bottom")
 
 # ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
 #        height=6,width=8.4,units="in")
 
+# ggsave("CoverageVsMostUncertainNarrow.png", dpi=600,
+#        height=3,width=7,units="in")
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
 
@@ -130,18 +132,20 @@ ggplot()+
               data=monte_carlo_envelope)+
   geom_line(aes(x=b,y=median, color=algo),linetype=1,size=1,
             data=monte_carlo_envelope)+
-  facet_wrap(~dataset, scales="free_y")+
+  facet_wrap(~dataset, scales="free_y",nrow=1)+
   scale_color_manual("Algorithm:", values=algo_colors[c(1,3)])+
   scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
   theme_bw()+
   labs(x="Query Step (b)",
        y="Facility Locations Utility")+
-  theme(axis.title = element_text(size=15),
+  theme(axis.title = element_text(size=12),
         legend.position = "bottom")
 
 # ggsave("flUtilPlaceholder.png", dpi=600,
 #        height=6,width=8.4,units="in")
 
+# ggsave("flUtilNarrow.png", dpi=600,
+#        height=3,width=7,units="in")
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
 #  number of UUs found : number UUs exected under confidence
@@ -228,7 +232,7 @@ ggplot() +
                         linetype = guide_legend(reverse=T))
 
 # ggsave("discoveryRatioPlaceholder.png", dpi=600,
-#        height=4,width=4,units="in")
+#        height=3.2,width=4,units="in")
 
 
 
