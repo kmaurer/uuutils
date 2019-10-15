@@ -36,8 +36,8 @@ ggplot()+
   geom_line(aes(x=b,y=median, color=algo),
             data=bw_monte_carlo_envelope,size=1.5)+
   facet_wrap(~dataset, scales="free_y",nrow=1)+
-  scale_color_manual("Algorithm:", values=algo_colors[c(1,2)])+
-  scale_fill_manual("Algorithm:", values=algo_colors[c(1,2)])+
+  scale_color_manual("Query Algorithm:", values=algo_colors[c(1,2)])+
+  scale_fill_manual("Query Algorithm:", values=algo_colors[c(1,2)])+
   theme_bw()+
   labs(x="Query Step (b)",
        y="Coverage-Based Utility")+
@@ -50,7 +50,7 @@ ggplot()+
 #        height=6,width=8.4,units="in")
 
 ggsave("CoverageVsMostUncertainNarrow.png", dpi=600,
-       height=2.4,width=7,units="in")
+       height=2.2,width=7,units="in")
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
 
@@ -103,7 +103,7 @@ ggplot()+
         plot.margin=grid::unit(c(0,0,2,0), "mm"),
         legend.box.margin=margin(-10,-10,-10,-10))
 # ggsave("overconfidence_2.png",dpi=600,width=4.1,height=3.8,units="in")
-ggsave("overconfidence.png",dpi=600,width=4,height=2.4,units="in")
+ggsave("overconfidence.png",dpi=600,width=4,height=2.2,units="in")
 
 #---------------------------------------------------------------------------------------
 # Figure 3: comparing MU and FL searches on FL utility
@@ -137,8 +137,8 @@ ggplot()+
   geom_line(aes(x=b,y=median, color=algo),linetype=1,size=1,
             data=monte_carlo_envelope)+
   facet_wrap(~dataset, scales="free_y",nrow=1)+
-  scale_color_manual("Algorithm:", values=algo_colors[c(1,3)])+
-  scale_fill_manual("Algorithm:", values=algo_colors[c(1,3)])+
+  scale_color_manual("Query Algorithm:", values=algo_colors[c(1,3)])+
+  scale_fill_manual("Query Algorithm:", values=algo_colors[c(1,3)])+
   theme_bw()+
   labs(x="Query Step (b)",
        y="Facility Locations Utility")+
@@ -151,7 +151,7 @@ ggplot()+
 #        height=6,width=8.4,units="in")
 
 ggsave("flUtilNarrow.png", dpi=600,
-       height=2.4,width=7,units="in")
+       height=2.2,width=7,units="in")
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
 #  number of UUs found : number UUs exected under confidence
@@ -232,9 +232,7 @@ ggplot() +
   theme_bw() +
   theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
         axis.text.y= element_text(angle=90, hjust=.5),
-        legend.background =  element_rect(color="black"),
-        legend.text = element_text(size=9),
-        legend.title = element_text(size=8))+
+        legend.background =  element_rect(color="black"))+
   coord_flip() + guides(colour = guide_legend(reverse=T),
                         shape = guide_legend(reverse=T),
                         linetype = guide_legend(reverse=T))
