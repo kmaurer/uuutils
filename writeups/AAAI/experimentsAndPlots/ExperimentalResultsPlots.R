@@ -42,13 +42,15 @@ ggplot()+
   labs(x="Query Step (b)",
        y="Coverage-Based Utility")+
   theme(axis.title = element_text(size=12),
-        legend.position = "bottom")
+        legend.position = "bottom",
+        plot.margin=grid::unit(c(0,0,2,0), "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10))
 
 # ggsave("CoverageVsMostUncertainPlaceholder.png", dpi=600,
 #        height=6,width=8.4,units="in")
 
-# ggsave("CoverageVsMostUncertainNarrow.png", dpi=600,
-#        height=3,width=7,units="in")
+ggsave("CoverageVsMostUncertainNarrow.png", dpi=600,
+       height=2.4,width=7,units="in")
 #---------------------------------------------------------------------
 # Figure 2: overconfidence plot
 
@@ -88,7 +90,7 @@ head(overconf_bins)
 
 ggplot()+
   geom_rect(aes(xmin=xmin, xmax=xmax, ymin=0, ymax=accuracy, color=type,fill=type), data=overconf_bins) +
-  annotate(geom="segment", x=.65,y=.65,xend=1,yend=1, size=1, color="gray30",linetype=2) +
+  # annotate(geom="segment", x=.65,y=.65,xend=1,yend=1, size=1, color="gray30",linetype=2) +
   facet_grid(~data_source)+
   scale_x_continuous(breaks=c(.6,.7,.8,.9,1))+
   scale_y_continuous(breaks=seq(0,1,by=.2))+
@@ -96,10 +98,12 @@ ggplot()+
   scale_color_manual("",values=c("black","black"))+
   labs(x="Model Confidence", y="Accuracy")+
   theme_bw()+
-  theme(legend.position = "bottom")+
-  coord_fixed()
+  theme(axis.title = element_text(size=12),
+        legend.position = "bottom",
+        plot.margin=grid::unit(c(0,0,2,0), "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10))
 # ggsave("overconfidence_2.png",dpi=600,width=4.1,height=3.8,units="in")
-
+ggsave("overconfidence.png",dpi=600,width=4,height=2.4,units="in")
 
 #---------------------------------------------------------------------------------------
 # Figure 3: comparing MU and FL searches on FL utility
@@ -139,13 +143,15 @@ ggplot()+
   labs(x="Query Step (b)",
        y="Facility Locations Utility")+
   theme(axis.title = element_text(size=12),
-        legend.position = "bottom")
+        legend.position = "bottom",
+        plot.margin=grid::unit(c(0,0,2,0), "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10))
 
 # ggsave("flUtilPlaceholder.png", dpi=600,
 #        height=6,width=8.4,units="in")
 
-# ggsave("flUtilNarrow.png", dpi=600,
-#        height=3,width=7,units="in")
+ggsave("flUtilNarrow.png", dpi=600,
+       height=2.4,width=7,units="in")
 #-------------------------------------------------------------------------------
 # Figure 4: Standardized mortality ratio style comparison 
 #  number of UUs found : number UUs exected under confidence
@@ -226,10 +232,14 @@ ggplot() +
   theme_bw() +
   theme(legend.position = c(.9999,.9999),legend.justification = c(1,1),
         axis.text.y= element_text(angle=90, hjust=.5),
-        legend.background =  element_rect(color="black"))+
+        legend.background =  element_rect(color="black"),
+        legend.text = element_text(size=9),
+        legend.title = element_text(size=8))+
   coord_flip() + guides(colour = guide_legend(reverse=T),
                         shape = guide_legend(reverse=T),
                         linetype = guide_legend(reverse=T))
+
+
 
 # ggsave("discoveryRatioPlaceholder.png", dpi=600,
 #        height=3.2,width=4,units="in")
